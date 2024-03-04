@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "chrome-newtab",
+  "description": "chrome定制化新窗口页面",
+  "version": "0.0.1",
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab/index.html"
+  },
+  "background": {
+    "matches": ["*://*/*"],
+    "service_worker": "background/index.js"
+  },
+  "permissions": [
+    "scripting",
+    "tabs",
+    "storage",
+    "webNavigation",
+    "activeTab",
+    "webRequest",
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback"
+  ],
+  "host_permissions": ["*://*/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["*.png", "content/*.js"],
+      "matches": ["*://*/*"]
+    }
+  ],
+
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "rule1",
+        "enabled": true,
+        "path": "rule.json"
+      }
+    ]
+  }
+}
