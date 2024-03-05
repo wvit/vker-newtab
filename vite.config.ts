@@ -11,7 +11,6 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        'newtab/index': 'src/newtab/index.tsx',
         'background/index': 'src/background/index.ts',
 
         'newtab/index.css': 'src/newtab/index.less',
@@ -37,5 +36,5 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-  },
+  }
 })

@@ -31,15 +31,5 @@
       "resources": ["*.png", "content/*.js"],
       "matches": ["*://*/*"]
     }
-  ],
-
-  "declarative_net_request": {
-    "rule_resources": [
-      {
-        "id": "rule1",
-        "enabled": true,
-        "path": "rule.json"
-      }
-    ]
-  }
+  ]
 }
