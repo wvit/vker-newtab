@@ -1,10 +1,10 @@
 /** 参考： https://github.com/microsoft/monaco-editor/blob/21007360cad28648bdf46282a2592cb47c3a7a6f/samples/browser-esm-vite-react/src/components/Editor.tsx */
 import React, { useRef, useState, useEffect, memo } from 'react'
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-import './userWorker'
+import ts from 'typescript'
+import type Monaco from 'monaco-editor'
 
 export const Editor = memo(() => {
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>()
+  const [editor, setEditor] = useState<Monaco.editor.IStandaloneCodeEditor>()
   const monacoRef = useRef<any>()
 
   useEffect(() => {
@@ -13,16 +13,24 @@ export const Editor = memo(() => {
         setEditor(editor => {
           if (editor) return editor
 
+          const code = `
+          function greeter(name?: string) {
+            return "Hello, " + name;
+          }
+          const user = "TypeScript";
+          console.log(greeter(user));
+        `
+          const result = ts.transpileModule(code, {
+            compilerOptions: { module: ts.ModuleKind.None },
+          })
+
           return monaco.editor.create(monacoRef.current!, {
-            value: [
-              'function x() {',
-              '\tconsole.log("Hello world!");',
-              '}',
-            ].join('\n'),
+            value: result.outputText,
             language: 'typescript',
+            theme: 'vs-dark',
           })
         })
-      }, 1000)
+      }, 100)
     }
 
     return () => editor?.dispose()

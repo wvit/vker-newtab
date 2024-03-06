@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import GridLayout from 'react-grid-layout'
-// import Editor from '@monaco-editor/react'
 import { Row, Col } from 'antd'
-import { Editor } from '../Editor'
 import pandaImg from '@/assets/imgs/panda.jpeg'
-// import '../Editor/userWorker'
+import { Editor } from '../Editor'
 
 export const Layout = () => {
   const [gridLayout, setGridLayout] = useState()

@@ -6,7 +6,7 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": false,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "noImplicitThis": false,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
@@ -19,7 +19,7 @@
     "noEmit": true,
     "jsx": "react",
     "baseUrl": "./",
-    "types": ["node"],
+    "types": ["node", "chrome"],
     "paths": {
       "@/*": ["src/*"]
     }
