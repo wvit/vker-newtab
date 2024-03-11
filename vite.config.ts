@@ -1,11 +1,12 @@
 import path from 'path'
+import fs from 'fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   root: 'src',
-  
+
   publicDir: '../public',
 
   build: {
@@ -15,9 +16,12 @@ export default defineConfig({
     rollupOptions: {
       input: {
         'background/index': 'src/background/index.ts',
+        'iframe/script': 'src/iframe/script.js',
+
         'newtab/index.html': 'src/newtab/index.html',
+        'iframe/index.html': 'src/iframe/index.html',
       },
-      output: {        
+      output: {
         entryFileNames: `[name].js`,
 
         assetFileNames: ({ name }: any) => {

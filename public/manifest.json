@@ -18,12 +18,7 @@
   "permissions": [
     "scripting",
     "tabs",
-    "storage",
-    "webNavigation",
-    "activeTab",
-    "webRequest",
-    "declarativeNetRequest",
-    "declarativeNetRequestFeedback"
+    "storage"
   ],
   "host_permissions": ["*://*/*"],
   "web_accessible_resources": [
@@ -31,5 +26,11 @@
       "resources": ["*.png", "content/*.js"],
       "matches": ["*://*/*"]
     }
-  ]
+  ],
+  "content_security_policy": {
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals;"
+  },
+  "sandbox": {
+    "pages": ["iframe/index.html"]
+  }
 }
