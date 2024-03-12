@@ -25,8 +25,8 @@ export const Editor = memo((props: EditorProps) => {
       if (state || !monaco) return state
       const monacoEditor = monaco.editor.create(monacoRef.current!, {
         value: `
-.desktop_header_zoom {
-  display: 'none';
+.t_header {
+  background: red !important;
 }
 `,
         language: 'css',

@@ -38,8 +38,9 @@ export const Layout = () => {
       .then(async res => {
         Dom.query('.iframe').contentWindow.postMessage(
           {
-            action: 'html',
-            content: res,
+            action: 'iframeLoad',
+            iframeContent: res,
+            cssContent: content,
           },
           '*'
         )
@@ -82,7 +83,7 @@ export const Layout = () => {
               <iframe
                 // src="https://cn.bing.com/translator?ref=TThis&text=&from=&to=en"
                 // src={`http://127.0.0.1:8080/iframe.html?t=${Date.now()}`}
-                src={`/iframe/index.html?t=${Date.now()}`}
+                src={`chrome-extension://kpgohkejeinlkekmbdmgeplmbjfmmgmp/iframe/index.html`}
                 className="iframe w-[100%] h-0 flex-1 "
               ></iframe>
               {/* <div className="sandbox w-[100%] h-0 flex-1 "></div> */}
