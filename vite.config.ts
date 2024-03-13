@@ -16,10 +16,10 @@ export default defineConfig({
     rollupOptions: {
       input: {
         'background/index': 'src/background/index.ts',
-        'iframe/script': 'src/iframe/script.js',
+        'sandbox/script': 'src/sandbox/script.js',
 
         'newtab/index.html': 'src/newtab/index.html',
-        'iframe/index.html': 'src/iframe/index.html',
+        'sandbox/index.html': 'src/sandbox/index.html',
       },
       output: {
         entryFileNames: `[name].js`,

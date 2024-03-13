@@ -31,6 +31,6 @@
     "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals;"
   },
   "sandbox": {
-    "pages": ["iframe/index.html"]
+    "pages": ["sandbox/index.html"]
   }
 }

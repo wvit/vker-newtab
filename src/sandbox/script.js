@@ -1,3 +1,6 @@
+/** 父级向当前沙盒环境注入的变量 */
+const { urlQuery } = sandboxData || {}
+
 /** 存放当前正在进行中的 xhr 请求 */
 const xhrSendMap = {}
 
@@ -6,22 +9,27 @@ const logger = (options, ...otherParams) => {
   if (options?.log) console.log(...otherParams)
 }
 
+/** 替换url地址 */
+const replaceUrl = url => {
+  if (!url) return url
+
+  if (url.indexOf(urlQuery?.extensionId) === 0) {
+    url = url.replace(urlQuery?.extensionId, urlQuery?.domain)
+  } else if (url.indexOf('/') === 0) {
+    url = urlQuery?.domain + url
+  } else if (url.indexOf('about://') === 0) {
+    url = url.replace('about://', 'https://')
+  }
+
+  return url
+}
+
 /** 拦截并修改 XMLHttpRequest */
 const xhrModify = options => {
   const xhrOpen = XMLHttpRequest.prototype.open
 
   XMLHttpRequest.prototype.open = function (method, url, ...params) {
-    if (
-      url.indexOf('chrome-extension://kpgohkejeinlkekmbdmgeplmbjfmmgmp') === 0
-    ) {
-      url = url.replace(
-        'chrome-extension://kpgohkejeinlkekmbdmgeplmbjfmmgmp',
-        'https://www.bing.com'
-      )
-    } else if (url.indexOf('/') === 0) {
-      url = 'https://www.bing.com' + url
-    }
-
+    url = replaceUrl(url)
     this.method = method
     this.url = url
 
@@ -32,12 +40,18 @@ const xhrModify = options => {
   XMLHttpRequest.prototype.send = function (data) {
     const xhrSendKey = Math.random().toString().slice(2)
     const postData = {
-      action: 'xhrSend',
-      xhrSendKey,
-      method: this.method || 'GET',
-      url: this.url,
-      headers: this.getAllResponseHeaders() || {},
-      body: data,
+      action: 'request',
+      forward: true,
+      requestData: {
+        method: this.method || 'GET',
+        url: this.url,
+        headers: this.getAllResponseHeaders() || {},
+        body: data,
+      },
+      callbackData: {
+        action: 'response',
+        xhrSendKey,
+      },
     }
 
     xhrSendMap[xhrSendKey] = this
@@ -52,18 +66,9 @@ const appendChildModify = options => {
 
   Element.prototype.appendChild = function (node) {
     if (node?.tagName?.toLowerCase() === 'script') {
-      if (
-        node.src?.indexOf(
-          'chrome-extension://kpgohkejeinlkekmbdmgeplmbjfmmgmp'
-        ) === 0
-      ) {
-        node.src = node.src.replace(
-          'chrome-extension://kpgohkejeinlkekmbdmgeplmbjfmmgmp',
-          'https://www.bing.com'
-        )
-      }
+      node.src = replaceUrl(node.src)
 
-      logger(options, 'appendChild-script:', src)
+      logger(options, 'appendChild-script:', node.src)
     }
 
     return originalAppendChild.apply(this, arguments)
@@ -79,11 +84,7 @@ const setAttributeModify = options => {
       this.tagName.toLowerCase() === 'script' &&
       name.toLowerCase() === 'src'
     ) {
-      if (value.indexOf('/') === 0) {
-        value = 'https://www.bing.com' + value
-      } else if (value.indexOf('about://') === 0) {
-        value = value.replace('about://', 'https://')
-      }
+      value = replaceUrl(value)
 
       logger(options, 'setAttribute-src:', value)
       originalSetAttribute.call(this, name, value)
@@ -110,9 +111,7 @@ const newImageModify = options => {
 
     Object.defineProperty(img, 'src', {
       set: function (src) {
-        if (src.indexOf('/') === 0) {
-          src = 'https://www.bing.com' + src
-        }
+        src = replaceUrl(src)
 
         logger(options, 'setImage-src:', src)
         originalSrcSetter.call(this, src)
@@ -146,9 +145,7 @@ const createElementModify = options => {
 
       Object.defineProperty(scriptElement, 'src', {
         set: function (src) {
-          if (src?.indexOf('/') === 0) {
-            src = 'https://www.bing.com' + src
-          }
+          src = replaceUrl(src)
 
           logger(options, 'createElement-src:', src)
           originalSrcSetter.call(this, src)
@@ -169,11 +166,12 @@ const createElementModify = options => {
 /** 监听 postMessage 事件 */
 const onWindowMessage = options => {
   window.addEventListener('message', e => {
-    const { action, xhrSendKey, responseText, headers, status, statusText } =
-      e.data
+    const { action, xhrSendKey, responseData } = e.data
 
-    if (action === 'xhrResponse') {
+    if (action === 'response') {
+      const { responseText, headers, status, statusText } = responseData || {}
       const xhr = xhrSendMap[xhrSendKey]
+
       if (!xhr) return
 
       Object.defineProperty(xhr, 'readyState', {
