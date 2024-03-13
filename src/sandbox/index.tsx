@@ -15,10 +15,12 @@ const replaceUrl = url => {
 
   if (url.indexOf(urlQuery?.extensionId) === 0) {
     url = url.replace(urlQuery?.extensionId, urlQuery?.domain)
+  } else if (url.indexOf('//') === 0) {
+    url = url.replace(/^\/\//, urlQuery?.protocol)
   } else if (url.indexOf('/') === 0) {
     url = urlQuery?.domain + url
   } else if (url.indexOf('about://') === 0) {
-    url = url.replace('about://', 'https://')
+    url = url.replace('about://', urlQuery?.protocol)
   }
 
   return url
@@ -34,6 +36,7 @@ window.addEventListener('message', e => {
     window.top?.postMessage(
       {
         action: 'request',
+        sandboxId: urlQuery?.sandboxId,
         requestData: {
           method: 'GET',
           url: urlQuery?.url,
@@ -48,16 +51,16 @@ window.addEventListener('message', e => {
     iframe.srcdoc = responseText
       .replace(
         /<script\s+[^>]*src\s*=\s*(['"])(.*?)\1[^>]*>/gi,
-        (match, quote, src) => {
+        (_, __, src) => {
           return `<script src="${replaceUrl(src)}">`
         }
       )
-      .replace(
-        /background-image:\s*url\((['"]?)(.*?)\1\)/gi,
-        (match, quote, url) => {
-          return `background-image: url(${replaceUrl(url)})`
-        }
-      )
+      .replace(/background-image:\s*url\((['"]?)(.*?)\1\)/gi, (_, __, url) => {
+        return `background-image: url(${replaceUrl(url)})`
+      })
+      .replace(/(action|href|src)="([^"]*)"/gi, (_, attrName, attrValue) => {
+        return `${attrName}="${replaceUrl(attrValue)}"`
+      })
       .replace(
         /(<head>)/i,
         `
@@ -70,9 +73,7 @@ window.addEventListener('message', e => {
 <script src='/sandbox/script.js'></script>
 
 <style>
-  .t_header {
-    background: red !important;
-  }
+  ${codeData?.css}
 </style>
 
 <script>

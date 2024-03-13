@@ -3,44 +3,43 @@ import { createRoot } from 'react-dom/client'
 import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import axios from 'axios'
+import { Dom } from '@/utils'
 import { Layout } from './Layout'
 import './index.less'
 
-window.addEventListener('message', e => {
-  const { action, forward, requestData, callbackData } = e.data
+window.addEventListener('message', async e => {
+  const { action, forward, sandboxId, requestData, callbackData } = e.data
 
   if (action === 'request') {
-    const { method, url, headers, body } = requestData || {}
-    axios({
+    const { method, url, headers: requestHeader, body } = requestData || {}
+    const res = await axios({
       method,
       url,
-      headers,
+      headers: requestHeader,
       data: body,
       withCredentials: true,
-    }).then(res => {
-      const { data, status, statusText, headers } = res
-      const iframe: any = document.querySelector('.iframe')
-      const jsonType = headers['content-type']?.includes('application/json;')
-      const resultData = {
-        ...callbackData,
-        responseData: {
-          status,
-          statusText,
-          headers,
-          responseText: jsonType ? JSON.stringify(data) : data,
-        },
-      }
-
-      iframe.contentWindow.postMessage(
-        forward
-          ? {
-              action: 'forward',
-              forwardData: resultData,
-            }
-          : { ...resultData },
-        '*'
-      )
     })
+    const { data, status, statusText, headers } = res
+    const jsonType = headers['content-type']?.includes('application/json;')
+    const resultData = {
+      ...callbackData,
+      responseData: {
+        status,
+        statusText,
+        headers,
+        responseText: jsonType ? JSON.stringify(data) : data,
+      },
+    }
+
+    Dom.query(`#${sandboxId}`).contentWindow.postMessage(
+      forward
+        ? {
+            action: 'forward',
+            forwardData: resultData,
+          }
+        : { ...resultData },
+      '*'
+    )
   }
 })
 
