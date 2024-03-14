@@ -18,7 +18,9 @@
   "permissions": [
     "scripting",
     "tabs",
-    "storage"
+    "storage",
+    "proxy",
+    "webRequest"
   ],
   "host_permissions": ["*://*/*"],
   "web_accessible_resources": [

@@ -17,68 +17,66 @@ export const Layout = () => {
 
   /** 保存编辑器内容 */
   const saveEditor = content => {
-    Dom.query('#sandbox-1').contentWindow.postMessage(
-      {
-        action: 'loadSandbox',
-        codeData: {
-          css: `
-    body {
-      min-width: 100vw !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      overflow-x: hidden !important;
-    }
-          
-    .desktop_header_zoom,
-    .desktop_header_menu,
-    .desktop_header,
-    #b_footer,
-    #t_lang_attr,
-    #tta_phrasebook {
-      display: none !important;
-    }
+    // Dom.query('#sandbox-1').contentWindow.postMessage(
+    //   {
+    //     action: 'loadSandbox',
+    //     codeData: {
+    //       css: `
+    // body {
+    //   min-width: 100vw !important;
+    //   width: 100vw !important;
+    //   height: 100vh !important;
+    //   overflow-x: hidden !important;
+    // }
 
-    #tt_translatorHome {
-      margin: 0 !important;
-      width: 100vw !important;
-      // height: 100vh !important;
-    }
-    `,
-        },
-      },
-      '*'
-    )
+    // .desktop_header_zoom,
+    // .desktop_header_menu,
+    // .desktop_header,
+    // #b_footer,
+    // #t_lang_attr,
+    // #tta_phrasebook {
+    //   display: none !important;
+    // }
+
+    // #tt_translatorHome {
+    //   margin: 0 !important;
+    //   width: 100vw !important;
+    //   // height: 100vh !important;
+    // }
+    // `,
+    //     },
+    //   },
+    //   '*'
+    // )
 
     Dom.query('#sandbox-2').contentWindow.postMessage(
       {
         action: 'loadSandbox',
         codeData: {
-          css: `
-    body {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    ._content-border_zc167_4.content-border_2OSp3  {
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      background: #fff;
-      margin: 0;
-    }
-
-    .scroll-scroller_4CQvp.animation_7dmRU,
-    .scroll_vtvf1 {
-      overflow-x: auto !important;
-      overflow-y: hidden !important;
-    }
-    `,
+          //       css: `
+          // body {
+          //   width: 100vw;
+          //   height: 100vh;
+          //   overflow: hidden;
+          // }
+          // ._content-border_zc167_4.content-border_2OSp3  {
+          //   position: fixed;
+          //   z-index: 999;
+          //   left: 0;
+          //   top: 0;
+          //   width: 100vw;
+          //   height: 100vh;
+          //   overflow-y: auto;
+          //   overflow-x: hidden;
+          //   background: #fff;
+          //   margin: 0;
+          // }
+          // .scroll-scroller_4CQvp.animation_7dmRU,
+          // .scroll_vtvf1 {
+          //   overflow-x: auto !important;
+          //   overflow-y: hidden !important;
+          // }
+          // `,
         },
       },
       '*'
@@ -103,8 +101,9 @@ export const Layout = () => {
       },
       'sandbox-2': {
         sandbox: {
-          editable: true,
-          url: 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&tn=baidu&wd=%E5%A4%A9%E6%B0%94&oq=sandbox%253D%2526quot%253Ballow-same-origin%2520allow-scripts%2526quot%253B&rsv_pq=eaf08f9600270087&rsv_t=8a97c9MroHddFTaxcx3dff%2B5zMwLI46nCiNnxtMCHbGl%2BmFpJ5qygin0DZQ&rqlang=cn&rsv_enter=1&rsv_dl=tb&rsv_btype=t&inputT=1615&rsv_sug3=15&rsv_sug1=2&rsv_sug7=100&rsv_sug2=0&rsv_sug4=2392',
+          editable: false,
+          // url: 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&wd=%E5%A4%A9%E6%B0%94&extensionMark=vker-desktop-proxy',
+          url: 'https://www.baidu.com?extensionMark=vker-desktop-proxy',
         },
       },
     }
