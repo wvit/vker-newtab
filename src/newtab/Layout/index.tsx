@@ -111,7 +111,7 @@ export const Layout = () => {
   return (
     <div className="h-[100vh] w-[100vw] relative">
       <div
-        className="w-[50%] h-[100%] overflow-auto"
+        className="w-[100%] h-[100%] overflow-auto"
         style={{
           background: `url(http://124.220.171.110:8000/static/image/panda.jpeg) center/cover no-repeat`,
         }}
@@ -162,9 +162,9 @@ export const Layout = () => {
         </div>
       </div>
 
-      <div className="w-[50%] h-[100%] bg-[#fff] absolute right-0 top-0">
+      {/* <div className="w-[50%] h-[100%] bg-[#fff] absolute right-0 top-0">
         <Editor onSave={saveEditor} />
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -22,7 +22,7 @@ chrome.webRequest.onBeforeRequest.addListener(
         () => {
           setTimeout(() => {
             chrome.proxy.settings.clear({ scope: 'regular' })
-          }, 150)
+          }, 200)
         }
       )
     }
