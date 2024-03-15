@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import GridLayout from 'react-grid-layout'
-import { Row, Col } from 'antd'
 import qs from 'qs'
 import { Dom } from '@/utils'
-import pandaImg from '@/assets/imgs/panda.jpeg'
 import { Editor } from '../Editor'
 
 export const Layout = () => {
@@ -103,7 +101,7 @@ export const Layout = () => {
         sandbox: {
           editable: false,
           // url: 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&wd=%E5%A4%A9%E6%B0%94&extensionMark=vker-desktop-proxy',
-          url: 'https://www.baidu.com?extensionMark=vker-desktop-proxy',
+          url: 'https://baidu.com?extensionMark=vker-desktop-proxy',
         },
       },
     }
@@ -111,14 +109,14 @@ export const Layout = () => {
   })
 
   return (
-    <Row className="h-[100vh] w-[100vw]">
-      <Col span={22}>
-        <div
-          className="h-[100%] w-[100%] overflow-auto"
-          style={{
-            background: `url(${pandaImg}) center/cover no-repeat`,
-          }}
-        >
+    <div className="h-[100vh] w-[100vw] relative">
+      <div
+        className="w-[50%] h-[100%] overflow-auto"
+        style={{
+          background: `url(http://124.220.171.110:8000/static/image/panda.jpeg) center/cover no-repeat`,
+        }}
+      >
+        <div className="h-[100vh] w-[100vw]">
           <GridLayout
             verticalCompact={false}
             cols={24}
@@ -145,9 +143,9 @@ export const Layout = () => {
                   key={i}
                   className="flex flex-col rounded overflow-hidden bg-[rgba(255,255,255,0.8)]"
                 >
-                  {/* <div className="w-[100%] h-[24px] flex justify-end items-center px-2 cursor-pointer box-border">
+                  <div className="w-[100%] h-[24px] flex justify-end items-center px-2 cursor-pointer box-border">
                     <span className="iconfont icon-code"></span>
-                  </div> */}
+                  </div>
                   <iframe
                     id={i}
                     src={
@@ -162,14 +160,11 @@ export const Layout = () => {
             })}
           </GridLayout>
         </div>
-      </Col>
-      <Col span={2}>
-        <div className="w-[100%] h-[100%] bg-[#fff]">
-          <div className="h-[100%]">
-            <Editor onSave={saveEditor} />
-          </div>
-        </div>
-      </Col>
-    </Row>
+      </div>
+
+      <div className="w-[50%] h-[100%] bg-[#fff] absolute right-0 top-0">
+        <Editor onSave={saveEditor} />
+      </div>
+    </div>
   )
 }

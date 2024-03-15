@@ -1,7 +1,6 @@
 chrome.webRequest.onBeforeRequest.addListener(
   function (details) {
     if (details.url.indexOf('vker-desktop-proxy') !== -1) {
-      console.log(11111, details)
       chrome.proxy.settings.set(
         {
           value: {

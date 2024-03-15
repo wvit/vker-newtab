@@ -26,7 +26,7 @@ export const Editor = memo((props: EditorProps) => {
       const monacoEditor = monaco.editor.create(monacoRef.current!, {
         language: 'css',
         theme: 'vs-dark',
-        tabSize: 2,
+        tabSize: 2
       })
 
       return monacoEditor
