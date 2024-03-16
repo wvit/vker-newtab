@@ -1,4 +1,4 @@
-import { getDate } from '../utils'
+import { getDate, inspectTimer } from '../utils'
 import type {
   PagingValue,
   StoreAllValue,
@@ -18,7 +18,7 @@ export class StoreHandle<T extends string[]> {
 
   /** 获取数据表可操作的方法 */
   get storeHandles() {
-    const { storeNames } = this.options.db?.options || {}
+    const { storeNames } = this.getDb('options') || {}
     const handles = {} as StoreHandles.Handles<T[number]>
 
     storeNames?.forEach(key => {
@@ -28,7 +28,7 @@ export class StoreHandle<T extends string[]> {
         clear: () => this.deleteData(key),
         edit: data => this.createData(key, data),
         getPage: query => this.getPageData(key, { query }),
-        getAll: () => this.getStoreAllData(key),
+        getAll: () => this.getAllData(key),
       }
     })
 
@@ -67,7 +67,7 @@ export class StoreHandle<T extends string[]> {
   }
 
   /** 获取所有数据 */
-  async getStoreAllData(storeName) {
+  async getAllData(storeName) {
     const store: IDBObjectStore = await this.getObjectStore(storeName)
     const data: StoreAllValue = { total: 0, list: [] }
 
@@ -134,26 +134,30 @@ export class StoreHandle<T extends string[]> {
     }
   }
 
-  /** 检查数据表是否准备完毕 */
-  async inspectStoreMounted() {
-    return new Promise<void>(resolve => {
-      const inspectTimer = setInterval(() => {
-        const { options, dataBase } = this.options?.db || {}
-
-        /** 判断数据表是否都已经创建完毕 */
-        if (options?.storeNames.length !== dataBase?.objectStoreNames.length) {
-          return
-        }
-        clearInterval(inspectTimer)
-        resolve()
-      }, 5)
-    })
+  /** 获取当前已创建的数据库属性值 */
+  getDb<T extends keyof typeof this.options.db>(key: T | T[]) {
+    if (typeof key === 'string') {
+      return this.options?.db?.[key]
+    } else {
+      return key.map(this.getDb.bind(this))
+    }
   }
 
   /** 获取数据表对象容器 */
   async getObjectStore(storeName) {
-    await this.inspectStoreMounted()
-    const { dataBase } = this.options?.db || {}
-    return dataBase.transaction([storeName], 'readwrite').objectStore(storeName)
+    /** 等待检查数据表是否都准备完毕 */
+    await inspectTimer(() => {
+      const [options, dbResult] = this.getDb(['options', 'dbResult'])
+      return options?.storeNames?.length === dbResult?.objectStoreNames?.length
+    })
+
+    /** 等待检查是否没有正在进行中的事务 */
+    await inspectTimer(() => {
+      return !this.getDb('dbRequest')?.transaction?.mode
+    })
+
+    return this.getDb('dbResult')
+      .transaction([storeName], 'readwrite')
+      .objectStore(storeName) as IDBObjectStore
   }
 }

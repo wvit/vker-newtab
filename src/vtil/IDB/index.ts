@@ -14,8 +14,8 @@ export class IDB<T extends string[]> {
   /** IndexedDB实例 */
   dbRequest?: IDBOpenDBRequest
 
-  /** 数据库 */
-  dataBase = {} as IDBDatabase
+  /** 当前打开的数据库 */
+  dbResult = {} as IDBDatabase
 
   /** 当前需要创建的数据表 */
   createStoreData: null | CreateStoreData = null
@@ -33,7 +33,7 @@ export class IDB<T extends string[]> {
       const { result } = e?.target as IDBOpenDBRequest
 
       /** 保存打开数据库的结果 */
-      this.dataBase = result
+      this.dbResult = result
 
       /** 判断当前是否有需要创建的数据表 */
       if (this.createStoreData) {
@@ -65,12 +65,12 @@ export class IDB<T extends string[]> {
       const { result } = e?.target as IDBOpenDBRequest
 
       /** 保存打开数据库的结果 */
-      this.dataBase = result
+      this.dbResult = result
 
       /** 循环创建数据表 */
-      for (let i = 0; i < storeNames.length; i++) {
+      for (const item of storeNames) {
         await this.createObjectStore({
-          storeName: storeNames[i],
+          storeName: item,
           options: { keyPath: 'id' },
         })
       }
@@ -112,7 +112,7 @@ export class IDB<T extends string[]> {
 
         if (callback(result)) {
           /** 升级前需要先关闭数据库连接 */
-          this.dataBase.close()
+          this.dbResult.close()
           /** 重新打开并升级数据库版本，使其触发数据库 onupgradeneeded 事件 */
           this.dbRequest = indexedDB.open(name, version + 1)
           /** 在新返回的数据库连接实例上，绑定最初添加的事件 */

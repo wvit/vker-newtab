@@ -42,3 +42,30 @@ export const getRandom = (max: number, min = 0) => {
 
 /** 睡眠定时器，一般用于防止触发机器人验证或等待节点加载 */
 export const sleep = time => new Promise(resolve => setTimeout(resolve, time))
+
+/** 定时检测器 */
+export const inspectTimer = (
+  callback: (count: number) => boolean,
+  options?: { time: number; maxCount: number }
+) => {
+  const { time = 10, maxCount = 100 } = options || {}
+
+  return new Promise<void>(resolve => {
+    let count = 0
+
+    const timer = setInterval(() => {
+      const done = () => {
+        clearInterval(timer)
+        resolve()
+      }
+
+      count++
+      try {
+        if (callback(count) || count > maxCount) done()
+      } catch (e) {
+        done()
+        console.error('inspectTimer 出错', e)
+      }
+    }, time)
+  })
+}
