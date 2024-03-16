@@ -1,9 +1,7 @@
 import { message } from 'antd'
 import Axios from 'axios'
 
-const axios = Axios.create({
-  baseURL: 'https://www.zhipin.com',
-})
+const axios = Axios.create({})
 
 axios.interceptors.response.use(res => {
   const { data, status } = res

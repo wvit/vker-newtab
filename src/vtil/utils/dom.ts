@@ -87,7 +87,7 @@ export class Dom {
     }
 
     /** 创建并添加子节点 */
-    node.create = function (tagName: string, attrs: { [key: string]: any }) {
+    node.create = function (tagName: string, attrs?: { [key: string]: any }) {
       const tag = Dom.create(tagName, attrs)
       this.add(tag)
       return tag

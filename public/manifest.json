@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "chrome-newtab",
-  "description": "chrome定制化新窗口页面",
+  "name": "vker-newtab",
+  "description": "virtual-worker-newtab（chrome定制化新窗口页面）",
   "version": "0.0.1",
   "icons": {
     "16": "icon.png",
@@ -15,13 +15,7 @@
     "matches": ["*://*/*"],
     "service_worker": "background/index.js"
   },
-  "permissions": [
-    "scripting",
-    "tabs",
-    "storage",
-    "proxy",
-    "webRequest"
-  ],
+  "permissions": ["scripting", "tabs", "storage", "proxy", "webRequest"],
   "host_permissions": ["*://*/*"],
   "web_accessible_resources": [
     {

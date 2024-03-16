@@ -113,7 +113,7 @@ export const Layout = () => {
       <div
         className="w-[100%] h-[100%] overflow-auto"
         style={{
-          background: `url(http://124.220.171.110:8000/static/image/panda.jpeg) center/cover no-repeat`,
+          background: `url(http://124.220.171.110:8000/static/image/panda1.jpg) center/cover no-repeat`,
         }}
       >
         <div className="h-[100vh] w-[100vw]">

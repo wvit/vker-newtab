@@ -10,7 +10,7 @@ export const local = {
   },
 
   /** 设置chrome数据缓存 */
-  set(data: any, callback?: () => void) {
+  set(data: any, callback = () => {}) {
     return chrome.storage.local.set(data, callback)
   },
 
@@ -22,13 +22,3 @@ export const local = {
 
 /** 获取chrome扩展资源 */
 export const getResource = (resource: string) => chrome.runtime.getURL(resource)
-
-/** 获取一个指定长度的数组 */
-export const getArr = length => {
-  return Array(length)
-    .fill(null)
-    .map((_, index) => index)
-}
-
-/** 睡眠定时器，一般用于防止触发机器人验证或等待节点加载 */
-export const sleep = time => new Promise(resolve => setTimeout(resolve, time))
