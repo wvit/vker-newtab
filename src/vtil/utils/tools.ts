@@ -40,6 +40,11 @@ export const getRandom = (max: number, min = 0) => {
   return min + Math.ceil(Math.random() * (max - min))
 }
 
+/** 获取一个20位长度的随机id */
+export const getId = () => {
+  return Math.random().toString().slice(2) + getRandom(9999)
+}
+
 /** 睡眠定时器，一般用于防止触发机器人验证或等待节点加载 */
 export const sleep = time => new Promise(resolve => setTimeout(resolve, time))
 

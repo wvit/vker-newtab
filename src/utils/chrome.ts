@@ -22,3 +22,16 @@ export const local = {
 
 /** 获取chrome扩展资源 */
 export const getResource = (resource: string) => chrome.runtime.getURL(resource)
+
+/** 发送message事件 */
+export const sendMessage = (message: {
+  action: string
+  [key: string]: any
+}) => {
+  return new Promise<any>(resolve => {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      if (!tabs[0]?.id) return
+      chrome.tabs.sendMessage(tabs[0].id, message, resolve)
+    })
+  })
+}

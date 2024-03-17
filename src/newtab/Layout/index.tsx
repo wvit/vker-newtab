@@ -1,113 +1,51 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import GridLayout from 'react-grid-layout'
 import qs from 'qs'
-import { Dom } from '@/utils'
+import { storeHandles } from '@/utils'
 import { Editor } from '../Editor'
 import './index.less'
 
 export const Layout = () => {
-  const [gridLayout, setGridLayout] = useState<any[]>()
+  const [widgetList, setWidgetList] = useState<any[]>([])
+  const initSandboxIdsRef = useRef<string[]>([])
+
+  /** 获取小部件列表 */
+  const getWidgetList = async () => {
+    const { list } = await storeHandles.widget.getAll()
+    setWidgetList(list || [])
+  }
 
   /** 保存栅格布局数据 */
-  const saveGridLayout = layout => {
-    setGridLayout(layout)
-    localStorage.setItem('gridLayout', JSON.stringify(layout))
+  const saveGridLayout = layouts => {
+    const newWidgetList = widgetList.map(item => {
+      const { id, layoutData } = item
+      const findLayout = layouts.find(layoutItem => layoutItem.i === id)
+      return { ...item, layoutData: findLayout || layoutData }
+    })
+
+    setWidgetList(newWidgetList)
+    storeHandles.widget.batchUpdate(newWidgetList)
+  }
+
+  /** 初始化沙盒容器 */
+  const initSandbox = (ref, widgetData) => {
+    const { id, codeData } = widgetData || {}
+    /** 已经初始化过，就不再reload */
+    if (initSandboxIdsRef.current.includes(id)) return
+
+    initSandboxIdsRef.current.push(id)
+    setTimeout(() => {
+      ref.contentWindow.postMessage({ action: 'loadSandbox', codeData }, '*')
+    }, 100)
   }
 
   /** 保存编辑器内容 */
-  const saveEditor = content => {
-    // Dom.query('#sandbox-1').contentWindow.postMessage(
-    //   {
-    //     action: 'loadSandbox',
-    //     codeData: {
-    //       css: `
-    // body {
-    //   min-width: 100vw !important;
-    //   width: 100vw !important;
-    //   height: 100vh !important;
-    //   overflow-x: hidden !important;
-    // }
-
-    // .desktop_header_zoom,
-    // .desktop_header_menu,
-    // .desktop_header,
-    // #b_footer,
-    // #t_lang_attr,
-    // #tta_phrasebook {
-    //   display: none !important;
-    // }
-
-    // #tt_translatorHome {
-    //   margin: 0 !important;
-    //   width: 100vw !important;
-    //   // height: 100vh !important;
-    // }
-    // `,
-    //     },
-    //   },
-    //   '*'
-    // )
-
-    Dom.query('#sandbox-2').contentWindow.postMessage(
-      {
-        action: 'loadSandbox',
-        codeData: {
-          //       css: `
-          // body {
-          //   width: 100vw;
-          //   height: 100vh;
-          //   overflow: hidden;
-          // }
-          // ._content-border_zc167_4.content-border_2OSp3  {
-          //   position: fixed;
-          //   z-index: 999;
-          //   left: 0;
-          //   top: 0;
-          //   width: 100vw;
-          //   height: 100vh;
-          //   overflow-y: auto;
-          //   overflow-x: hidden;
-          //   background: #fff;
-          //   margin: 0;
-          // }
-          // .scroll-scroller_4CQvp.animation_7dmRU,
-          // .scroll_vtvf1 {
-          //   overflow-x: auto !important;
-          //   overflow-y: hidden !important;
-          // }
-          // `,
-        },
-      },
-      '*'
-    )
-  }
+  const saveEditor = content => {}
 
   useEffect(() => {
-    const cacheGridLayout = JSON.parse(
-      localStorage.getItem('gridLayout') || 'null'
-    )
-    if (!cacheGridLayout) return
-    setGridLayout(cacheGridLayout)
+    getWidgetList()
+    storeHandles.widget.onChange(getWidgetList)
   }, [])
-
-  gridLayout?.forEach(item => {
-    const sandboxMap = {
-      'sandbox-1': {
-        sandbox: {
-          editable: true,
-          url: 'https://www.bing.com/translator?ref=TThis&text=&from=&to=en&mkt=zh-CN',
-        },
-      },
-      'sandbox-2': {
-        sandbox: {
-          editable: false,
-          // url: 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&wd=%E5%A4%A9%E6%B0%94&extensionMark=vker-desktop-proxy',
-          url: 'https://baidu.com?extensionMark=vker-desktop-proxy',
-        },
-      },
-    }
-    item.sandbox = sandboxMap[item.i].sandbox
-  })
 
   return (
     <div className="h-[100vh] w-[100vw] relative">
@@ -124,36 +62,37 @@ export const Layout = () => {
             rowHeight={100}
             width={window.innerWidth}
             margin={[0, 0]}
-            layout={gridLayout}
+            layout={widgetList.map(item => item.layoutData)}
             onDragStop={saveGridLayout}
             onResizeStop={saveGridLayout}
           >
-            {gridLayout?.map(item => {
-              const { sandbox, i } = item
-              const domain = sandbox?.url.match(/(https?:\/\/[^\/]+)/)?.[0]
-              const protocol = sandbox?.url.match(/^https?:\/\//)?.[0]
+            {widgetList?.map(item => {
+              const { sandboxData, id } = item
+              const domain = sandboxData?.url.match(/(https?:\/\/[^\/]+)/)?.[0]
+              const protocol = sandboxData?.url.match(/^https?:\/\//)?.[0]
               const urlQuery = qs.stringify({
                 protocol,
                 domain,
-                url: sandbox?.url,
+                url: sandboxData?.url,
                 extensionId: `chrome-extension://${chrome.runtime.id}`,
-                sandboxId: i,
+                sandboxId: id,
               })
 
               return (
                 <div
-                  key={i}
+                  key={id}
                   className="flex flex-col rounded overflow-hidden bg-[rgba(255,255,255,0.8)]"
                 >
                   <div className="w-[100%] h-[24px] flex justify-end items-center px-2 cursor-pointer box-border">
                     <span className="iconfont icon-code"></span>
                   </div>
                   <iframe
-                    id={i}
+                    ref={ref => initSandbox(ref, item)}
+                    id={id}
                     src={
-                      sandbox?.editable
+                      sandboxData?.editable
                         ? `/sandbox/index.html?${urlQuery}`
-                        : sandbox?.url
+                        : sandboxData?.url
                     }
                     className="w-[100%] h-0 flex-1 "
                   ></iframe>

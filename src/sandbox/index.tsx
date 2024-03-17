@@ -35,7 +35,7 @@ window.addEventListener('message', e => {
     sandboxData.codeData = codeContent
     window.top?.postMessage(
       {
-        action: 'request',
+        action: 'httpRequest',
         sandboxId: urlQuery?.sandboxId,
         requestData: {
           method: 'GET',

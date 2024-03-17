@@ -43,7 +43,7 @@
     XMLHttpRequest.prototype.send = function (data) {
       const xhrSendKey = Math.random().toString().slice(2)
       const postData = {
-        action: 'request',
+        action: 'httpRequest',
         forward: true,
         sandboxId: urlQuery?.sandboxId,
         requestData: {
@@ -53,7 +53,7 @@
           body: data,
         },
         callbackData: {
-          action: 'response',
+          action: 'httpResponse',
           xhrSendKey,
         },
       }
@@ -172,7 +172,7 @@
     window.addEventListener('message', e => {
       const { action, xhrSendKey, responseData } = e.data
 
-      if (action === 'response') {
+      if (action === 'httpResponse') {
         const { responseText, headers, status, statusText } = responseData || {}
         const xhr = xhrSendMap[xhrSendKey]
 

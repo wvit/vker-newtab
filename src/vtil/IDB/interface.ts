@@ -19,18 +19,34 @@ export namespace StoreHandles {
   export type Handles<T extends string> = Record<
     T,
     {
-      /** 添加数据方法 */
-      add: (data) => Promise<boolean>
-      /** 批量删除数据 */
+      /** 添加数据 */
+      create: (data: any) => Promise<boolean>
+      /** 更新数据 */
+      update: (data: any) => Promise<boolean>
+
+      /** 批量添加数据 */
+      batchCreate: (data: any[]) => Promise<boolean>
+      /** 批量更新数据 */
+      batchUpdate: (data: any[]) => Promise<boolean>
+
+      /** 删除数据 */
       delete: (id: string) => Promise<boolean>
       /** 删除所有数据 */
-      clear: () => Promise<boolean>
-      /** 编辑修改数据 */
-      edit: (data) => Promise<boolean>
+      deleteAll: () => Promise<boolean>
+
+      /** 获取数据详情 */
+      detail: (id: string) => Promise<any>
       /** 获取查询条件的分页数据 */
-      getPage: (query) => Promise<PagingValue>
+      getPage: (query: Query) => Promise<PagingValue>
       /** 获取查询条件的所有数据 */
       getAll: () => Promise<StoreAllValue>
+
+      /** 监听数据发生变化 */
+      onChange: <T>(callback: T) => {
+        id: string
+        callback: T
+        remove: () => void
+      }
     }
   >
 }

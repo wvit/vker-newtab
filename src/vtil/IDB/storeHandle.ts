@@ -1,4 +1,4 @@
-import { getDate, inspectTimer } from '../utils'
+import { getDate, getId, inspectTimer } from '../utils'
 import type {
   PagingValue,
   StoreAllValue,
@@ -16,6 +16,9 @@ export class StoreHandle<T extends string[]> {
   /** 实例化参数 */
   options = {} as StoreHandleOptions<T>
 
+  /** 监听数据发生改变的事件 */
+  changeEvents = [] as { id: string; callback: (e: any) => any }[]
+
   /** 获取数据表可操作的方法 */
   get storeHandles() {
     const { storeNames } = this.getDb('options') || {}
@@ -23,12 +26,27 @@ export class StoreHandle<T extends string[]> {
 
     storeNames?.forEach(key => {
       handles[key] = {
-        add: data => this.createData(key, data),
-        delete: id => this.deleteData(key, id),
-        clear: () => this.deleteData(key),
-        edit: data => this.createData(key, data),
-        getPage: query => this.getPageData(key, { query }),
-        getAll: () => this.getAllData(key),
+        create: data => this.createUpdate(key, data),
+        update: data => this.createUpdate(key, data),
+
+        batchCreate: data => this.batchCreateUpdate(key, data),
+        batchUpdate: data => this.batchCreateUpdate(key, data),
+
+        delete: id => this.delete(key, id),
+        deleteAll: () => this.deleteAll(key),
+
+        detail: id => this.getDetail(key, id),
+        getPage: query => this.getPage(key, { query }),
+        getAll: () => this.getAll(key),
+
+        onChange: callback => {
+          const event = { id: getId(), callback }
+          this.changeEvents.push(event)
+          return {
+            ...event,
+            remove: () => this.removeChangeEvent(event.id),
+          }
+        },
       }
     })
 
@@ -36,38 +54,74 @@ export class StoreHandle<T extends string[]> {
   }
 
   /** 向数据表新增数据，如果数据id存在，就更改数据 */
-  async createData(storeName, data) {
+  async createUpdate(storeName, data, batchCall?) {
     const store = await this.getObjectStore(storeName)
-    const addData = Array.isArray(data) ? data.pop() : data
-    const findData = store.get(addData.id)
+    const findData = store.get(data.id)
 
     return new Promise<boolean>(resolve => {
       findData.onsuccess = () => {
         let request = null as unknown as IDBRequest<IDBValidKey>
 
         if (findData.result) {
-          request = store.put({ ...findData.result, ...addData })
+          request = store.put({ ...findData.result, ...data })
         } else {
-          request = store.add(this.getCreateData(addData))
+          request = store.add(this.getCreateData(data))
         }
 
         request.onsuccess = () => {
-          if (data.length) this.createData(storeName, data)
+          if (!batchCall) {
+            this.runChangeEvents({ action: 'createUpdate', changeData: data })
+          }
           resolve(true)
         }
       }
     })
   }
 
-  /** 删除数据表中的数据 */
-  async deleteData(storeName, id?) {
-    const store: IDBObjectStore = await this.getObjectStore(storeName)
-    await (id ? store.delete(id) : store.clear())
+  /** 批量新建或更新数据 */
+  async batchCreateUpdate(storeName, data) {
+    for (const item of data) {
+      await this.createUpdate(storeName, item, true)
+    }
+    this.runChangeEvents({ action: 'batchCreateUpdate', changeData: data })
+
     return true
   }
 
+  /** 删除数据表中的数据 */
+  async delete(storeName, id) {
+    const store: IDBObjectStore = await this.getObjectStore(storeName)
+
+    await store.delete(id)
+    this.runChangeEvents({ action: 'delete', changeData: id })
+
+    return true
+  }
+
+  /** 删除数据表中的所有数据 */
+  async deleteAll(storeName) {
+    const store: IDBObjectStore = await this.getObjectStore(storeName)
+
+    await store.clear()
+    this.runChangeEvents({ action: 'deleteAll' })
+
+    return true
+  }
+
+  /** 获取数据项详情数据 */
+  async getDetail(storeName, id?) {
+    const store = await this.getObjectStore(storeName)
+    const findData = store.get(id)
+
+    return new Promise<any>(resolve => {
+      findData.onsuccess = () => {
+        resolve(findData.result || null)
+      }
+    })
+  }
+
   /** 获取所有数据 */
-  async getAllData(storeName) {
+  async getAll(storeName) {
     const store: IDBObjectStore = await this.getObjectStore(storeName)
     const data: StoreAllValue = { total: 0, list: [] }
 
@@ -82,7 +136,7 @@ export class StoreHandle<T extends string[]> {
   }
 
   /** 获取分页数据 */
-  async getPageData(storeName, options: GetPageDataOptions) {
+  async getPage(storeName, options: GetPageDataOptions) {
     const { query, indexName = 'keyword', direction = 'prev' } = options
     const store: IDBObjectStore = await this.getObjectStore(storeName)
     const { pageNo, pageSize, keyword = '' } = query
@@ -124,12 +178,25 @@ export class StoreHandle<T extends string[]> {
     })
   }
 
+  /** 移除 change 事件监听 */
+  removeChangeEvent(id) {
+    const findIndex = this.changeEvents.findIndex(item => item.id === id)
+    this.changeEvents.splice(findIndex, 1)
+  }
+
+  /** 运行已监听的 change 事件 */
+  runChangeEvents(eventData: { action: string; changeData?: any }) {
+    this.changeEvents.forEach(item => {
+      const { id, callback } = item
+      callback?.({ id, ...eventData })
+    })
+  }
+
   /** 新建数据添加公共字段 */
   getCreateData(data) {
-    const id = Date.now()
     return {
-      id: id.toString(),
-      createDate: getDate({ time: id, full: true }),
+      id: getId(),
+      createDate: getDate({ time: Date.now(), full: true }),
       ...data,
     }
   }
