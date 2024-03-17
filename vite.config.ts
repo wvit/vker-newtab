@@ -19,6 +19,7 @@ export default defineConfig({
         'sandbox/script': 'src/sandbox/script.js',
 
         'newtab/index.html': 'src/newtab/index.html',
+        'action/index.html': 'src/action/index.html',
         'sandbox/index.html': 'src/sandbox/index.html',
       },
       output: {

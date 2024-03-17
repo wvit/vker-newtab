@@ -5,7 +5,7 @@ import zhCN from 'antd/locale/zh_CN'
 import axios from 'axios'
 import { Dom } from '@/utils'
 import { Layout } from './Layout'
-import './index.less'
+import '@/styles/common.less'
 
 window.addEventListener('message', async e => {
   const { action, forward, sandboxId, requestData, callbackData } = e.data

@@ -3,6 +3,7 @@ import GridLayout from 'react-grid-layout'
 import qs from 'qs'
 import { Dom } from '@/utils'
 import { Editor } from '../Editor'
+import './index.less'
 
 export const Layout = () => {
   const [gridLayout, setGridLayout] = useState<any[]>()
@@ -122,6 +123,7 @@ export const Layout = () => {
             cols={24}
             rowHeight={100}
             width={window.innerWidth}
+            margin={[0, 0]}
             layout={gridLayout}
             onDragStop={saveGridLayout}
             onResizeStop={saveGridLayout}

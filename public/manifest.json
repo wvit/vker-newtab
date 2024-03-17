@@ -11,6 +11,10 @@
   "chrome_url_overrides": {
     "newtab": "newtab/index.html"
   },
+  "action": {
+    "default_popup": "action/index.html",
+    "default_icon": "icon.png"
+  },
   "background": {
     "matches": ["*://*/*"],
     "service_worker": "background/index.js"
