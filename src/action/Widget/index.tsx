@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState } from 'react'
 import { Image } from 'antd'
+import { Icon } from '@/components'
 import { sendMessage } from '@/utils'
 import './index.less'
 
@@ -33,7 +34,7 @@ export const Widget = memo(() => {
             <li className="card-item w-[31.2%] h-[200px] m-2 p-2 flex flex-col">
               <div className="mb-1 flex justify-between items-center">
                 {name}
-                <span className="iconfont icon-widget-setting cursor-pointer hover:text-[#1677ff]"></span>
+                <Icon name="icon-widget-setting" className="cursor-pointer " />
               </div>
               <Image src={cover} />
             </li>

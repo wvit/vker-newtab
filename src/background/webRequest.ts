@@ -1,6 +1,6 @@
 chrome.webRequest.onBeforeRequest.addListener(
   function (details) {
-    if (details.url.indexOf('vker-desktop-proxy') !== -1) {
+    if (details.url.indexOf('vker-newtab-proxy') !== -1) {
       chrome.proxy.settings.set(
         {
           value: {
@@ -35,7 +35,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 
 // chrome.webRequest.onHeadersReceived.addListener(
 //   function (details) {
-//     if (details.url.indexOf('vker-desktop-proxy') !== -1) {
+//     if (details.url.indexOf('vker-newtab-proxy') !== -1) {
 //       chrome.proxy.settings.clear({ scope: 'regular' })
 //     }
 //   },

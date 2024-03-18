@@ -71,7 +71,7 @@ body {
     layoutData: { i: 'widget-2', w: 10, h: 4, x: 8, y: 2 },
     sandboxData: {
       editable: true,
-      // extensionMark=vker-desktop-proxy
+      // extensionMark=vker-newtab-proxy
       url: 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&wd=%E5%A4%A9%E6%B0%94',
     },
     codeData: {

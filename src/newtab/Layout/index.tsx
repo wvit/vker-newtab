@@ -1,19 +1,56 @@
 import React, { useEffect, useState, useRef } from 'react'
 import GridLayout from 'react-grid-layout'
 import qs from 'qs'
-import { Icon } from '@/components'
-import { storeHandles } from '@/utils'
-import { Editor } from '../Editor'
+import { Icon, Editor } from '@/components'
+import { Dom, storeHandles } from '@/utils'
 import './index.less'
 
 export const Layout = () => {
   const [widgetList, setWidgetList] = useState<any[]>([])
+  const [fileTree, setFileTree] = useState<any[]>([])
+  const [activeFile, setActiveFile] = useState('')
+  const [currentCodeValue, setCurrentCodeValue] = useState('')
   const initSandboxIdsRef = useRef<string[]>([])
 
   /** 获取小部件列表 */
   const getWidgetList = async () => {
     const { list } = await storeHandles.widget.getAll()
+    const treeData = list.map(item => {
+      const { name, id, codeData } = item
+      const fileList = Object.keys(codeData).map(key => {
+        return {
+          key: `${id}:${key}`,
+          title: `index.${key}`,
+          codeValue: codeData[key],
+          icon: () => {
+            const iconProps = {
+              css: { name: 'icon-css', className: 'size-5' },
+              js: { name: 'icon-js', className: 'size-3' },
+              ts: { name: 'icon-ts' },
+            }[key]
+
+            return iconProps && <Icon {...iconProps} />
+          },
+        }
+      })
+
+      return { title: name, key: id, children: fileList }
+    })
+
+    setFileTree(treeData)
     setWidgetList(list || [])
+  }
+
+  /** 初始化沙盒容器 */
+  const initSandbox = (ref, widgetData) => {
+    const { id, codeData } = widgetData || {}
+    /** 已经初始化过，就不再reload */
+    if (initSandboxIdsRef.current.includes(id)) return
+
+    initSandboxIdsRef.current.push(id)
+    setTimeout(() => {
+      ref.contentWindow.postMessage({ action: 'loadSandbox', codeData }, '*')
+    }, 200)
   }
 
   /** 保存栅格布局数据 */
@@ -28,20 +65,28 @@ export const Layout = () => {
     storeHandles.widget.batchUpdate(newWidgetList)
   }
 
-  /** 初始化沙盒容器 */
-  const initSandbox = (ref, widgetData) => {
-    const { id, codeData } = widgetData || {}
-    /** 已经初始化过，就不再reload */
-    if (initSandboxIdsRef.current.includes(id)) return
+  /** 选中文件项 */
+  const selectFile = selectNode => {
+    const { codeValue, key } = selectNode
+    if (!codeValue) return
 
-    initSandboxIdsRef.current.push(id)
-    setTimeout(() => {
-      ref.contentWindow.postMessage({ action: 'loadSandbox', codeData }, '*')
-    }, 100)
+    setCurrentCodeValue(codeValue)
+    setActiveFile(key)
   }
 
   /** 保存编辑器内容 */
-  const saveEditor = content => {}
+  const saveEditor = async content => {
+    if (!activeFile) return
+    const [id, key] = activeFile.split(':')
+    const findWidget = widgetList.find(item => item.id === id)
+    const sandbox = Dom.query(`#${id}`)
+    if (!findWidget || !sandbox) return
+    const { codeData } = findWidget
+
+    codeData[key] = content
+    await storeHandles.widget.update({ id, codeData })
+    sandbox.contentWindow.postMessage({ action: 'loadSandbox', codeData }, '*')
+  }
 
   useEffect(() => {
     getWidgetList()
@@ -49,12 +94,13 @@ export const Layout = () => {
   }, [])
 
   return (
-    <div className="h-[100vh] w-[100vw] flex">
+    <div className="h-[100vh] w-[100vw] flex overflow-hidden">
       <div
         className="h-[100%] w-[100%] overflow-auto"
         style={{
           background: `url(http://124.220.171.110:8000/static/image/panda1.jpg) center/cover no-repeat`,
         }}
+        onClickCapture={() => setActiveFile('')}
       >
         <div className="h-[100vh] w-[100vw]">
           <GridLayout
@@ -68,13 +114,14 @@ export const Layout = () => {
             onResizeStop={saveGridLayout}
           >
             {widgetList?.map(item => {
-              const { sandboxData, id } = item
-              const domain = sandboxData?.url.match(/(https?:\/\/[^\/]+)/)?.[0]
-              const protocol = sandboxData?.url.match(/^https?:\/\//)?.[0]
+              const { sandboxData, codeData, id } = item
+              const { url, editable } = sandboxData || {}
+              const domain = url?.match(/(https?:\/\/[^\/]+)/)?.[0]
+              const protocol = url?.match(/^https?:\/\//)?.[0]
               const urlQuery = qs.stringify({
                 protocol,
                 domain,
-                url: sandboxData?.url,
+                url,
                 extensionId: `chrome-extension://${chrome.runtime.id}`,
                 sandboxId: id,
               })
@@ -85,16 +132,20 @@ export const Layout = () => {
                   className="sandbox-item flex flex-col rounded overflow-hidden "
                 >
                   <div className="sandbox-header overflow-hidden bg-[rgba(255,255,255,0.6)] w-[100%] h-0 flex justify-end items-center px-2 cursor-pointer transition-[200ms] absolute top-0 left-0">
-                    <Icon name="icon-code" />
+                    <Icon
+                      name="icon-code"
+                      onClick={() => {
+                        selectFile({
+                          key: `${id}:css`,
+                          codeValue: codeData?.css,
+                        })
+                      }}
+                    />
                   </div>
                   <iframe
                     ref={ref => initSandbox(ref, item)}
                     id={id}
-                    src={
-                      sandboxData?.editable
-                        ? `/sandbox/index.html?${urlQuery}`
-                        : sandboxData?.url
-                    }
+                    src={editable ? `/sandbox/index.html?${urlQuery}` : url}
                     className="w-[100%] h-0 flex-1 "
                   ></iframe>
                 </div>
@@ -103,8 +154,19 @@ export const Layout = () => {
           </GridLayout>
         </div>
       </div>
-      <div className="w-[50%] h-[100%] flex-shrink-0 bg-[#fff]">
-        <Editor onSave={saveEditor} />
+      <div
+        className="w-[50%] h-[100%] flex-shrink-0 bg-[#fff] duration-200"
+        style={{
+          marginRight: activeFile ? 0 : '-100%',
+        }}
+      >
+        <Editor
+          value={currentCodeValue}
+          activeFile={activeFile}
+          fileTree={fileTree}
+          onSave={saveEditor}
+          onSelectFile={selectFile}
+        />
       </div>
     </div>
   )
