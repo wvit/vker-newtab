@@ -8,7 +8,7 @@ import '@/styles/common.less'
 const App = () => {
   return (
     <ConfigProvider locale={zhCN}>
-      <div className="w-[800px] h-[600px] p-2 box-border bg-[#f9f9f9]">
+      <div className="w-[800px] h-[600px] p-2 bg-[#f9f9f9]">
         <Widget />
       </div>
     </ConfigProvider>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import GridLayout from 'react-grid-layout'
 import qs from 'qs'
+import { Icon } from '@/components'
 import { storeHandles } from '@/utils'
 import { Editor } from '../Editor'
 import './index.less'
@@ -48,9 +49,9 @@ export const Layout = () => {
   }, [])
 
   return (
-    <div className="h-[100vh] w-[100vw] relative">
+    <div className="h-[100vh] w-[100vw] flex">
       <div
-        className="w-[100%] h-[100%] overflow-auto"
+        className="h-[100%] w-[100%] overflow-auto"
         style={{
           background: `url(http://124.220.171.110:8000/static/image/panda1.jpg) center/cover no-repeat`,
         }}
@@ -81,10 +82,10 @@ export const Layout = () => {
               return (
                 <div
                   key={id}
-                  className="flex flex-col rounded overflow-hidden bg-[rgba(255,255,255,0.8)]"
+                  className="sandbox-item flex flex-col rounded overflow-hidden "
                 >
-                  <div className="w-[100%] h-[24px] flex justify-end items-center px-2 cursor-pointer box-border">
-                    <span className="iconfont icon-code"></span>
+                  <div className="sandbox-header overflow-hidden bg-[rgba(255,255,255,0.6)] w-[100%] h-0 flex justify-end items-center px-2 cursor-pointer transition-[200ms] absolute top-0 left-0">
+                    <Icon name="icon-code" />
                   </div>
                   <iframe
                     ref={ref => initSandbox(ref, item)}
@@ -102,10 +103,9 @@ export const Layout = () => {
           </GridLayout>
         </div>
       </div>
-
-      {/* <div className="w-[50%] h-[100%] bg-[#fff] absolute right-0 top-0">
+      <div className="w-[50%] h-[100%] flex-shrink-0 bg-[#fff]">
         <Editor onSave={saveEditor} />
-      </div> */}
+      </div>
     </div>
   )
 }

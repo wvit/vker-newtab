@@ -2,6 +2,7 @@
   position: relative;
 
   .react-grid-item {
+    z-index: 2;
     transition: all 200ms ease;
     transition-property: left, top, width, height;
 
@@ -24,7 +25,6 @@
     &.react-draggable-dragging,
     &.resizing {
       transition: none;
-      z-index: 2;
       will-change: transform;
     }
 
@@ -64,6 +64,14 @@
   .react-resizable-hide {
     .react-resizable-handle {
       display: none;
+    }
+  }
+}
+
+.sandbox-item {
+  &:hover {
+    .sandbox-header {
+      height: 24px;
     }
   }
 }
