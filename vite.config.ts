@@ -3,7 +3,6 @@ import fs from 'fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   root: 'src',
 
@@ -13,6 +12,7 @@ export default defineConfig({
     outDir: '../dist',
     emptyOutDir: true,
     reportCompressedSize: false,
+    
     rollupOptions: {
       input: {
         'background/index': 'src/background/index.ts',

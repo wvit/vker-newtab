@@ -74,3 +74,37 @@ export const inspectTimer = (
     }, time)
   })
 }
+
+/** 转换 url query 参数 */
+export const urlQuery = {
+  /** 获取当前 url query数据 */
+  getQuery: () => {
+    const query = urlQuery.parse(location?.search) || {}
+    return query
+  },
+
+  /** 将 url 中 query 参数提取出来 */
+  parse: url => {
+    const queryString = url.split('?')[1] || url.split('?')[0]
+
+    return queryString.split('&').reduce((query, item) => {
+      const [key, value] = item.split('=').map(decodeURIComponent)
+
+      if (key) {
+        query[key] = value
+        return query
+      }
+    }, {})
+  },
+
+  /** 将对象拼接为 queryString */
+  stringify: (query, url?) => {
+    const queryString = Object.keys(query)
+      .map(
+        key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`
+      )
+      .join('&')
+
+    return url ? `${url}?${queryString}` : queryString
+  },
+}

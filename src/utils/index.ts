@@ -4,5 +4,3 @@ export * from '@/vtil'
 export * from './axios'
 /** chrome extension api 方法 */
 export * from './chrome'
-/** 操作indexedDB数据库方法 */
-export * from './store'

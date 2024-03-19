@@ -1,26 +1,26 @@
-import qs from 'qs'
+import { urlQuery } from '@/utils'
 
 /** 当前沙盒环境需要用到的变量数据 */
 const sandboxData = {
   /** 沙盒需要执行的代码 */
   codeData: { css: '', js: '' },
   /** 当前链接上携带的参数 */
-  urlQuery: qs.parse(location.search.slice(1)),
+  query: urlQuery.getQuery(),
 }
 
 /** 替换url地址 */
 const replaceUrl = url => {
   if (!url) return url
-  const { urlQuery } = sandboxData
+  const { query } = sandboxData
 
-  if (url.indexOf(urlQuery?.extensionId) === 0) {
-    url = url.replace(urlQuery?.extensionId, urlQuery?.domain)
+  if (url.indexOf(query?.extensionId) === 0) {
+    url = url.replace(query?.extensionId, query?.domain)
   } else if (url.indexOf('//') === 0) {
-    url = url.replace(/^\/\//, urlQuery?.protocol)
+    url = url.replace(/^\/\//, query?.protocol)
   } else if (url.indexOf('/') === 0) {
-    url = urlQuery?.domain + url
+    url = query?.domain + url
   } else if (url.indexOf('about://') === 0) {
-    url = url.replace('about://', urlQuery?.protocol)
+    url = url.replace('about://', query?.protocol)
   }
 
   return url
@@ -29,17 +29,17 @@ const replaceUrl = url => {
 window.addEventListener('message', e => {
   const { action, forwardData, responseData, codeData: codeContent } = e.data
   const iframe: any = document.querySelector('.iframe')
-  const { codeData, urlQuery } = sandboxData
+  const { codeData, query } = sandboxData
 
   if (action === 'loadSandbox') {
     sandboxData.codeData = codeContent
     window.top?.postMessage(
       {
         action: 'httpRequest',
-        sandboxId: urlQuery?.sandboxId,
+        sandboxId: query?.sandboxId,
         requestData: {
           method: 'GET',
-          url: urlQuery?.url,
+          url: query?.url,
         },
         callbackData: { action: 'loadSandboxResponse' },
       },
@@ -66,7 +66,7 @@ window.addEventListener('message', e => {
         `
 <script> 
   const sandboxData = {
-    urlQuery: ${JSON.stringify(urlQuery)},
+    query: ${JSON.stringify(query)},
   }
 </script>
 

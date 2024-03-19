@@ -1,4 +1,4 @@
-import { storeHandles } from '@/utils'
+import { storeHandles } from '@/utils/store'
 
 /** 获取小部件列表 */
 const getWidgetList = async sendResponse => {

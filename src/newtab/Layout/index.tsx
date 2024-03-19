@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 import GridLayout from 'react-grid-layout'
-import qs from 'qs'
 import { Icon, Editor } from '@/components'
-import { Dom, storeHandles } from '@/utils'
+import { Dom, urlQuery } from '@/utils'
+import { storeHandles } from '@/utils/store'
 import './index.less'
 
 export const Layout = () => {
@@ -118,7 +118,7 @@ export const Layout = () => {
               const { url, editable } = sandboxData || {}
               const domain = url?.match(/(https?:\/\/[^\/]+)/)?.[0]
               const protocol = url?.match(/^https?:\/\//)?.[0]
-              const urlQuery = qs.stringify({
+              const queryString = urlQuery.stringify({
                 protocol,
                 domain,
                 url,
@@ -145,7 +145,7 @@ export const Layout = () => {
                   <iframe
                     ref={ref => initSandbox(ref, item)}
                     id={id}
-                    src={editable ? `/sandbox/index.html?${urlQuery}` : url}
+                    src={editable ? `/sandbox/index.html?${queryString}` : url}
                     className="w-[100%] h-0 flex-1 "
                   ></iframe>
                 </div>

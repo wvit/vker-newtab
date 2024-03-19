@@ -1,6 +1,6 @@
 ;(() => {
   /** 父级向当前沙盒环境注入的变量 */
-  const { urlQuery } = sandboxData || {}
+  const { query } = sandboxData || {}
 
   /** 存放当前正在进行中的 xhr 请求 */
   const xhrSendMap = {}
@@ -14,14 +14,14 @@
   const replaceUrl = url => {
     if (!url) return url
 
-    if (url.indexOf(urlQuery?.extensionId) === 0) {
-      url = url.replace(urlQuery?.extensionId, urlQuery?.domain)
+    if (url.indexOf(query?.extensionId) === 0) {
+      url = url.replace(query?.extensionId, query?.domain)
     } else if (url.indexOf('//') === 0) {
-      url = url.replace(/^\/\//, urlQuery?.protocol)
+      url = url.replace(/^\/\//, query?.protocol)
     } else if (url.indexOf('/') === 0) {
-      url = urlQuery?.domain + url
+      url = query?.domain + url
     } else if (url.indexOf('about://') === 0) {
-      url = url.replace('about://', urlQuery?.protocol)
+      url = url.replace('about://', query?.protocol)
     }
 
     return url
@@ -45,7 +45,7 @@
       const postData = {
         action: 'httpRequest',
         forward: true,
-        sandboxId: urlQuery?.sandboxId,
+        sandboxId: query?.sandboxId,
         requestData: {
           method: this.method || 'GET',
           url: this.url,
