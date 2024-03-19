@@ -38,7 +38,7 @@ const defaultWidgetList = [
       url: 'https://www.bing.com/translator?ref=TThis&text=&from=&to=en&mkt=zh-CN',
     },
     codeData: {
-      css: `
+      'content.css': `
 body {
   min-width: 100vw !important;
   width: 100vw !important;
@@ -75,7 +75,7 @@ body {
       url: 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&wd=%E5%A4%A9%E6%B0%94',
     },
     codeData: {
-      css: `
+      'content.css': `
 body {
   width: 100vw;
   height: 100vh;

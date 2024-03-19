@@ -37,10 +37,7 @@ window.addEventListener('message', e => {
       {
         action: 'httpRequest',
         sandboxId: query?.sandboxId,
-        requestData: {
-          method: 'GET',
-          url: query?.url,
-        },
+        requestData: { method: 'GET', url: query?.url },
         callbackData: { action: 'loadSandboxResponse' },
       },
       '*'
@@ -73,7 +70,7 @@ window.addEventListener('message', e => {
 <script src='/sandbox/script.js'></script>
 
 <style>
-  ${codeData?.css}
+  ${codeData?.['content.css']}
 </style>
 
 <script>

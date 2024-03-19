@@ -20,14 +20,14 @@ export const Layout = () => {
       const fileList = Object.keys(codeData).map(key => {
         return {
           key: `${id}:${key}`,
-          title: `index.${key}`,
+          title: key,
           codeValue: codeData[key],
           icon: () => {
             const iconProps = {
               css: { name: 'icon-css', className: 'size-5' },
               js: { name: 'icon-js', className: 'size-3' },
               ts: { name: 'icon-ts' },
-            }[key]
+            }[key.split('.')[1]]
 
             return iconProps && <Icon {...iconProps} />
           },
@@ -137,7 +137,7 @@ export const Layout = () => {
                       onClick={() => {
                         selectFile({
                           key: `${id}:css`,
-                          codeValue: codeData?.css,
+                          codeValue: codeData?.['content.css'],
                         })
                       }}
                     />
