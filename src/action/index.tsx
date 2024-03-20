@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ConfigProvider, Radio } from '@/components'
+import ConfigProvider from 'antd/es/config-provider'
+import Radio from 'antd/es/radio'
 import zhCN from 'antd/es/locale/zh_CN'
 import { Widget } from './Widget'
 import '@/styles/common.less'

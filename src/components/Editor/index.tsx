@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, memo } from 'react'
-import { message, Tree } from '../antd'
+import Tree from 'antd/es/tree'
+import message from 'antd/es/message'
 import type Monaco from 'monaco-editor'
 import type { TreeProps } from 'antd/es/tree'
 import './index.less'
@@ -17,7 +18,8 @@ export interface EditorProps {
   onSelectFile: (selectNode: any) => void
 }
 
-export default memo((props: EditorProps) => {
+/** vscode 风格编辑器 */
+export const Editor = memo((props: EditorProps) => {
   const { value, fileTree = [], activeFile, onSave, onSelectFile } = props
   const [editor, setEditor] = useState<Monaco.editor.IStandaloneCodeEditor>()
   const [messageApi, contextHolder] = message.useMessage({

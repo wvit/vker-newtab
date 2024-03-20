@@ -1,5 +1,10 @@
 import { memo, useEffect, useState } from 'react'
-import { Icon, Modal, Form, Input, Image, Collapse } from '@/components'
+import Modal from 'antd/es/modal'
+import Form from 'antd/es/form'
+import Input from 'antd/es/input'
+import Image from 'antd/es/image'
+import Collapse from 'antd/es/collapse'
+import { Icon } from '@/components/Icon'
 import { sendMessage } from '@/utils'
 import './index.less'
 

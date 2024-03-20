@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import GridLayout from 'react-grid-layout'
-import { Icon, Editor } from '@/components'
+import { Icon } from '@/components/Icon'
+import { Editor } from '@/components/Editor'
 import { Dom, urlQuery } from '@/utils'
 import { storeHandles } from '@/utils/store'
 import './index.less'

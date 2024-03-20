@@ -20,7 +20,7 @@ const allEntry = {
   },
 }
 
-/** 自定义当前需要构建哪些入口，减少 build 时间 */
+/** 自定义当前需要构建哪些入口，减少开发中 build 时间 */
 const input = (buildEntry || Object.keys(allEntry).join(','))
   .split(',')
   .reduce((prev, key) => ({ ...prev, ...allEntry[key] }), {})
