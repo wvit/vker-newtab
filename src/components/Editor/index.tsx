@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, memo } from 'react'
+import { useRef, useState, useEffect, memo } from 'react'
 import { message, Tree } from '../antd'
 import type Monaco from 'monaco-editor'
 import type { TreeProps } from 'antd/es/tree'
@@ -17,7 +17,7 @@ export interface EditorProps {
   onSelectFile: (selectNode: any) => void
 }
 
-export const Editor = memo((props: EditorProps) => {
+export default memo((props: EditorProps) => {
   const { value, fileTree = [], activeFile, onSave, onSelectFile } = props
   const [editor, setEditor] = useState<Monaco.editor.IStandaloneCodeEditor>()
   const [messageApi, contextHolder] = message.useMessage({

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Icon, Modal, Form, Input, Image, Collapse } from '@/components'
 import { sendMessage } from '@/utils'
 import './index.less'

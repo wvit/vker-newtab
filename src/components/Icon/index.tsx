@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
   /** 图标名称 */
@@ -6,7 +6,7 @@ export interface IconProps extends React.SVGProps<SVGSVGElement> {
 }
 
 /** symbol 图标 */
-export const Icon = memo((props: IconProps) => {
+export default memo((props: IconProps) => {
   const { name, className = '', ...otherProps } = props
 
   return (

@@ -30,6 +30,12 @@
   /** 拦截并修改 XMLHttpRequest */
   const xhrModify = options => {
     const xhrOpen = XMLHttpRequest.prototype.open
+    const xhrSetRequestHeader = XMLHttpRequest.prototype.setRequestHeader
+
+    XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
+      this.requestHeaders = { ...this.requestHeaders, [header]: value }
+      return xhrSetRequestHeader.call(this, header, value)
+    }
 
     XMLHttpRequest.prototype.open = function (method, url, ...params) {
       url = replaceUrl(url)
@@ -49,7 +55,7 @@
         requestData: {
           method: this.method || 'GET',
           url: this.url,
-          headers: this.getAllResponseHeaders() || {},
+          headers: this.requestHeaders,
           body: data,
         },
         callbackData: {

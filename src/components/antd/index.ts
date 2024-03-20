@@ -20,5 +20,5 @@ export {
   Tree,
   Input,
   Image,
-  Collapse
+  Collapse,
 }

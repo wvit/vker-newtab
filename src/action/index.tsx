@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ConfigProvider, Radio } from '@/components'
 import zhCN from 'antd/es/locale/zh_CN'
