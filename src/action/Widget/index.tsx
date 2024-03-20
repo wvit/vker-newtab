@@ -1,6 +1,5 @@
 import React, { memo, useEffect, useState } from 'react'
-import { Image, Modal, Form, Input, Collapse } from 'antd'
-import { Icon } from '@/components'
+import { Icon, Modal, Form, Input, Image, Collapse } from '@/components'
 import { sendMessage } from '@/utils'
 import './index.less'
 

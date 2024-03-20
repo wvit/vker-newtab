@@ -2,3 +2,5 @@
 export * from './Icon'
 /** 编辑器组件 */
 export * from './Editor'
+/** antd组件 */
+export * from './antd'

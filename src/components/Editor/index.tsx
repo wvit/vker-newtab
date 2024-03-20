@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, memo } from 'react'
-import { message, Tree } from 'antd'
+import { message, Tree } from '../antd'
 import type Monaco from 'monaco-editor'
-import type { TreeProps } from 'antd'
+import type { TreeProps } from 'antd/es/tree'
 import './index.less'
 
 export interface EditorProps {

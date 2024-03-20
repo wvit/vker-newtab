@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ConfigProvider, Radio } from 'antd'
-import zhCN from 'antd/locale/zh_CN'
+import { ConfigProvider, Radio } from '@/components'
+import zhCN from 'antd/es/locale/zh_CN'
 import { Widget } from './Widget'
 import '@/styles/common.less'
 

@@ -1,7 +1,29 @@
 import path from 'path'
-import fs from 'fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+
+const { buildEntry } = process.env
+
+const allEntry = {
+  background: {
+    'background/index': 'src/background/index.ts',
+  },
+  sandbox: {
+    'sandbox/script': 'src/sandbox/script.js',
+    'sandbox/index.html': 'src/sandbox/index.html',
+  },
+  action: {
+    'action/index.html': 'src/action/index.html',
+  },
+  newtab: {
+    'newtab/index.html': 'src/newtab/index.html',
+  },
+}
+
+/** 自定义当前需要构建哪些入口，减少 build 时间 */
+const input = (buildEntry || Object.keys(allEntry).join(','))
+  .split(',')
+  .reduce((prev, item) => ({ ...prev, ...allEntry[item] }), {})
 
 export default defineConfig({
   root: 'src',
@@ -10,28 +32,21 @@ export default defineConfig({
 
   build: {
     outDir: '../dist',
-    emptyOutDir: true,
+    emptyOutDir: !buildEntry,
     reportCompressedSize: false,
-    
-    rollupOptions: {
-      input: {
-        'background/index': 'src/background/index.ts',
-        'sandbox/script': 'src/sandbox/script.js',
 
-        'newtab/index.html': 'src/newtab/index.html',
-        'action/index.html': 'src/action/index.html',
-        'sandbox/index.html': 'src/sandbox/index.html',
-      },
+    rollupOptions: {
+      input,
       output: {
         entryFileNames: `[name].js`,
 
-        assetFileNames: ({ name }: any) => {
-          if (name.split('/').length > 1) {
-            return `[name].[ext]`
-          } else {
-            return `assets/${name}`
-          }
-        },
+        // assetFileNames: ({ name }: any) => {
+        //   if (name.split('/').length > 1) {
+        //     return `[name].[ext]`
+        //   } else {
+        //     return `assets/${name}`
+        //   }
+        // },
       },
     },
   },
@@ -46,7 +61,7 @@ export default defineConfig({
           await next()
 
           if (res.statusCode === 404) {
-            /** 兼容 localhost/newtab/ 和 localhost/newtab/index.html 写法 */
+            /** 兼容 http://localhost/newtab/ 和 http://localhost/newtab/index.html 写法 */
             res.writeHead(302, {
               Location: path.join(req.url || '', 'index.html'),
             })

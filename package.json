@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:watch": "vite build --watch",
-    "preview": "vite preview"
+    "build:entry": "buildEntry=newtab,action vite build --watch"
   },
   "dependencies": {
     "antd": "^5.14.1",

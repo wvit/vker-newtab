@@ -19,7 +19,13 @@
     "matches": ["*://*/*"],
     "service_worker": "background/index.js"
   },
-  "permissions": ["scripting", "tabs", "storage", "proxy", "webRequest"],
+  "permissions": [
+    "scripting",
+    "tabs",
+    "storage",
+    "proxy",
+    "webRequest"
+  ],
   "host_permissions": ["*://*/*"],
   "web_accessible_resources": [
     {

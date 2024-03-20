@@ -1,6 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { ConfigProvider, theme } from 'antd'
+import { ConfigProvider, theme } from '@/components'
 import zhCN from 'antd/locale/zh_CN'
 import { Layout } from './Layout'
 import './message'
