@@ -1,5 +1,6 @@
 {
-  "name": "chrome-newtab",
+  "name": "vker-newtab",
+  "description": "virtual-worker-newtab（chrome定制化新窗口页面）",
   "private": true,
   "version": "0.0.0",
   "type": "module",
