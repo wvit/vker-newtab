@@ -97,13 +97,15 @@ export const Layout = () => {
   return (
     <div className="h-[100vh] w-[100vw] flex overflow-hidden">
       <div
-        className="h-[100%] w-[100%] overflow-auto"
-        style={{
-          background: `url(http://124.220.171.110:8000/static/image/panda1.jpg) center/cover no-repeat`,
-        }}
+        className="h-[100%] w-[100%] overflow-x-auto"
         onClickCapture={() => setActiveFile('')}
       >
-        <div className="h-[100vh] w-[100vw]">
+        <div
+          className="h-[100vh] w-[100vw] overflow-y-auto"
+          style={{
+            background: `url(http://124.220.171.110:8000/static/image/panda1.jpg) center/cover no-repeat`,
+          }}
+        >
           <GridLayout
             verticalCompact={false}
             cols={24}

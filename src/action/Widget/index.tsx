@@ -1,11 +1,14 @@
 import { memo, useEffect, useState } from 'react'
-import message from 'antd/es/message'
 import Modal from 'antd/es/modal'
 import Form from 'antd/es/form'
 import Input from 'antd/es/input'
+import Switch from 'antd/es/switch'
 import Collapse from 'antd/es/collapse'
+import Popover from 'antd/es/popover'
+import Radio from 'antd/es/radio'
 import { Icon } from '@/components/Icon'
 import { Image } from '@/components/Image'
+import { Upload } from '@/components/Upload'
 import { sendMessage, getBase64 } from '@/utils'
 import './index.less'
 
@@ -14,8 +17,7 @@ const { Item, useForm } = Form
 /** 小部件管理列表 */
 export const Widget = memo(() => {
   const [widgetList, setWidgetList] = useState<WidgetType[]>([])
-  const [cover, serCover] = useState('')
-  const [widgetConfigVisible, setWidgetConfigVisible] = useState(true)
+  const [editWidgetData, setEditWidgetData] = useState<WidgetType | null>(null)
   const [formRef] = useForm()
 
   /** 获取小部件列表 */
@@ -24,26 +26,38 @@ export const Widget = memo(() => {
     setWidgetList(res || [])
   }
 
-  /** 上传图片文件 */
-  const uploadFile = async e => {
-    const file = e.target.files[0]
-    if (file.size > 5 * 1024 * 1024) {
-      return message.error('文最大为 5MB')
-    }
-    const imgBase64 = await getBase64(file)
-
-    serCover(imgBase64)
-  }
-
   /** 新增小部件到桌面 */
-  const addWidget = async widgetData => {
-    await sendMessage({ action: 'addWidget', widgetData })
+  const addWidget = async () => {
+    if (!editWidgetData) return
+    const values = await formRef.validateFields()
+    const newData = Object.keys(values!).reduce((prev, key) => {
+      const value = values[key]
+
+      if (Object.prototype.toString.call(value) === '[object Object]') {
+        prev[key] = { ...prev[key], ...value }
+      } else {
+        prev[key] = value
+      }
+
+      return prev
+    }, editWidgetData)
+
+    await sendMessage({ action: 'updateWidget', widgetData: newData })
+
+    setEditWidgetData(null)
     getWidgetList()
   }
 
   useEffect(() => {
     getWidgetList()
   }, [])
+
+  useEffect(() => {
+    if (editWidgetData) {
+      formRef.resetFields()
+      formRef.setFieldsValue(editWidgetData)
+    }
+  }, [editWidgetData])
 
   return (
     <div className="h-[100%] w-[100%] overflow-auto">
@@ -58,7 +72,7 @@ export const Widget = memo(() => {
                 <Icon
                   name="icon-widget-setting"
                   className="cursor-pointer "
-                  onClick={() => setWidgetConfigVisible(true)}
+                  onClick={() => setEditWidgetData(item)}
                 />
               </div>
               <Image src={cover} />
@@ -68,40 +82,78 @@ export const Widget = memo(() => {
       </ul>
 
       <Modal
-        open={widgetConfigVisible}
+        open={!!editWidgetData}
         width={600}
         title="小部件配置"
         className="widget-modal top-10"
-        onCancel={() => setWidgetConfigVisible(false)}
+        onCancel={() => setEditWidgetData(null)}
+        onOk={addWidget}
       >
-        <Form form={formRef} className=" pt-4">
+        <Form
+          form={formRef}
+          className=" pt-4"
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 16 }}
+        >
           <Item name="name" label="小部件名称" rules={[{ required: true }]}>
-            <Input />
+            <Input placeholder="请输入小部件名称" />
           </Item>
           <Item name="cover" label="小部件封面" rules={[{ required: true }]}>
-            <div className=" relative flex justify-center items-center flex-col w-[100px] h-[100px] border border-dashed border-[#999] rounded-md overflow-hidden">
-              {cover ? (
-                <Image src={cover} />
-              ) : (
-                <>
-                  <span className="text-[32px] font-thin">+</span>
-                  <p className=" text-xs">点击上传图片</p>
-                </>
-              )}
-              <input
-                className=" absolute w-[100%] h-[100%] z-10 opacity-0"
-                type="file"
-                accept="image/*"
-                onChange={uploadFile}
-              />
-            </div>
+            <Upload
+              onTransformFile={async e => {
+                return await getBase64(e.target.files?.[0])
+              }}
+            />
           </Item>
-          <Item name="type" label="小部件类型" rules={[{ required: true }]}>
-            <Input />
+          <Item
+            name={['sandboxData', 'type']}
+            label="小部件类型"
+            rules={[{ required: true }]}
+          >
+            <Radio.Group
+              options={[
+                {
+                  label: (
+                    <span className="flex items-center">
+                      iframe
+                      <Popover content="添加一个iframe地址，可向iframe内插入 css、js 来修改内容">
+                        <Icon name="icon-help" className=" ml-1 !size-3" />
+                      </Popover>
+                    </span>
+                  ),
+                  value: 'iframe',
+                },
+                {
+                  label: (
+                    <span className="flex items-center">
+                      自定义页面
+                      <Popover content="可在代码编辑器中直接添加 html、css、js">
+                        <Icon name="icon-help" className=" ml-1 !size-3" />
+                      </Popover>
+                    </span>
+                  ),
+                  value: 'html',
+                },
+              ]}
+            />
           </Item>
-          <Item name="url" label="iframe链接" rules={[{ required: true }]}>
-            <Input />
+
+          <Item noStyle dependencies={[['sandboxData', 'type']]}>
+            {() => {
+              return (
+                formRef.getFieldValue(['sandboxData', 'type']) === 'iframe' && (
+                  <Item
+                    name={['sandboxData', 'url']}
+                    label="iframe链接"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="请填写iframe链接地址" />
+                  </Item>
+                )
+              )
+            }}
           </Item>
+
           <Collapse
             ghost
             items={[
@@ -110,22 +162,30 @@ export const Widget = memo(() => {
                 label: '小部件容器样式',
                 children: (
                   <>
-                    <Item name="resize" label="是否允许调整大小">
-                      <Input />
+                    <Item
+                      name={['wrapData', 'resize']}
+                      label="是否允许调整大小"
+                    >
+                      <Switch />
                     </Item>
-                    <Item name="width" label="宽度">
-                      <Input />
+                    <Item
+                      name={['wrapData', 'border-radius']}
+                      label="圆角"
+                      wrapperCol={{ span: 8 }}
+                    >
+                      <Input placeholder="例如 50px 或 50%" />
                     </Item>
-                    <Item name="height" label="高度">
-                      <Input />
+                    <Item
+                      name={['wrapData', 'opacity']}
+                      label="整体透明度"
+                      wrapperCol={{ span: 8 }}
+                    >
+                      <Input placeholder="0 - 1 之间的不透明度" />
                     </Item>
-                    <Item name="border-radius" label="圆角">
-                      <Input />
-                    </Item>
-                    <Item name="background-color" label="背景颜色">
-                      <Input />
-                    </Item>
-                    <Item name="opacity" label="整体透明度">
+                    <Item
+                      name={['wrapData', 'background-color']}
+                      label="背景颜色"
+                    >
                       <Input />
                     </Item>
                   </>

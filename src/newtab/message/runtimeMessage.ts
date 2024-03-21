@@ -7,12 +7,18 @@ const getWidgetList = async sendResponse => {
 }
 
 /** 创建添加一个小部件 */
-const addWidget = async (widgetData, sendResponse) => {
-  const data = await storeHandles.widget.detail(widgetData.id)
-  if (!data) {
+const createWidget = async (widgetData, sendResponse) => {
+  const result = await storeHandles.widget.detail(widgetData.id)
+  if (!result) {
     await storeHandles.widget.create(widgetData)
   }
   sendResponse(true)
+}
+
+/** 更新小部件数据 */
+const updateWidget = async (widgetData, sendResponse) => {
+  const result = await storeHandles.widget.update(widgetData)
+  sendResponse(result)
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -20,8 +26,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (action === 'getWidgetList') {
     getWidgetList(sendResponse)
-  } else if (action === 'addWidget') {
-    addWidget(widgetData, sendResponse)
+  } else if (action === 'createWidget') {
+    createWidget(widgetData, sendResponse)
+  } else if (action === 'updateWidget') {
+    updateWidget(widgetData, sendResponse)
   }
 
   return true
@@ -106,4 +114,4 @@ body {
   },
 ]
 
-defaultWidgetList.forEach(item => addWidget(item, () => {}))
+defaultWidgetList.forEach(item => createWidget(item, () => {}))
