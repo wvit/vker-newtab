@@ -9,7 +9,7 @@ import Radio from 'antd/es/radio'
 import { Icon } from '@/components/Icon'
 import { Image } from '@/components/Image'
 import { Upload } from '@/components/Upload'
-import { sendMessage, getBase64 } from '@/utils'
+import { Action, Message, getBase64 } from '@/utils'
 import './index.less'
 
 const { Item, useForm } = Form
@@ -22,7 +22,9 @@ export const Widget = memo(() => {
 
   /** 获取小部件列表 */
   const getWidgetList = async () => {
-    const res = await sendMessage({ action: 'getWidgetList' })
+    const res = await Message.newtab.activeSend({
+      action: Action.Newtab.GetWidgetList,
+    })
     setWidgetList(res || [])
   }
 
@@ -42,7 +44,10 @@ export const Widget = memo(() => {
       return prev
     }, editWidgetData)
 
-    await sendMessage({ action: 'updateWidget', widgetData: newData })
+    await Message.newtab.activeSend({
+      action: Action.Newtab.UpdateWidget,
+      widgetData: newData,
+    })
 
     setEditWidgetData(null)
     getWidgetList()

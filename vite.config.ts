@@ -9,7 +9,7 @@ const allEntry = {
     'background/index': 'src/background/index.ts',
   },
   sandbox: {
-    'sandbox/script': 'src/sandbox/script.js',
+    'sandbox/script': 'src/sandbox/script.ts',
     'sandbox/index.html': 'src/sandbox/index.html',
   },
   action: {

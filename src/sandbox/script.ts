@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 ;(() => {
   /** 父级向当前沙盒环境注入的变量 */
   const { query } = sandboxData || {}
@@ -65,7 +67,7 @@
       }
 
       xhrSendMap[xhrSendKey] = this
-      window.top.postMessage(postData, '*')
+      window.top?.postMessage(postData, '*')
       logger(options, 'xhr-send:', postData)
     }
   }

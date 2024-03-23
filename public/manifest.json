@@ -17,14 +17,17 @@
   },
   "background": {
     "matches": ["*://*/*"],
-    "service_worker": "background/index.js"
+    "service_worker": "background/index.js",
+    "type": "module"
   },
   "permissions": [
     "scripting",
     "tabs",
+    "activeTab",
     "storage",
     "proxy",
-    "webRequest"
+    "webRequest",
+    "webNavigation"
   ],
   "host_permissions": ["*://*/*"],
   "web_accessible_resources": [
