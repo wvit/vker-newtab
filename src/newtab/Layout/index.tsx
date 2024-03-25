@@ -3,7 +3,7 @@ import GridLayout from 'react-grid-layout'
 import { Icon } from '@/components/Icon'
 import { Editor } from '@/components/Editor'
 import { storeHandles } from '@/utils/store'
-import { Dom, urlQuery } from '@/utils'
+import { Dom, urlQuery, Message, Action } from '@/utils'
 import './index.less'
 
 export const Layout = () => {
@@ -50,7 +50,10 @@ export const Layout = () => {
 
     initSandboxIdsRef.current.push(id)
     setTimeout(() => {
-      ref.contentWindow.postMessage({ action: 'loadSandbox', codeData }, '*')
+      Message.window.send(ref.contentWindow, {
+        action: Action.Window.LoadSandbox,
+        codeData,
+      })
     }, 200)
   }
 
@@ -86,7 +89,10 @@ export const Layout = () => {
 
     codeData[key] = content
     await storeHandles.widget.update({ id, codeData })
-    sandbox.contentWindow.postMessage({ action: 'loadSandbox', codeData }, '*')
+    Message.window.send(sandbox.contentWindow, {
+      action: Action.Window.LoadSandbox,
+      codeData,
+    })
   }
 
   useEffect(() => {

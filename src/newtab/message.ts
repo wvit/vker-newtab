@@ -59,13 +59,13 @@ Message.window.on(Action.Window.HttpRequest, async e => {
     },
   }
 
-  Dom.query(`#${sandboxId}`).contentWindow.postMessage(
+  Message.window.send(
+    Dom.query(`#${sandboxId}`).contentWindow,
     forward
       ? {
-          action: 'forward',
+          action: Action.Window.Forward,
           forwardData: resultData,
         }
-      : { ...resultData },
-    '*'
+      : { ...resultData }
   )
 })

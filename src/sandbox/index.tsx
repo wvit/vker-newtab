@@ -1,4 +1,4 @@
-import { urlQuery } from '@/utils'
+import { urlQuery, Action, Message } from '@/utils'
 
 /** 当前沙盒环境需要用到的变量数据 */
 const sandboxData = {
@@ -26,61 +26,63 @@ const replaceUrl = url => {
   return url
 }
 
-window.addEventListener('message', e => {
-  const { action, forwardData, responseData, codeData: codeContent } = e.data
-  const iframe: any = document.querySelector('.iframe')
+/** 监听通知加载 sandbox  */
+Message.window.on(Action.Window.LoadSandbox, e => {
+  const { query } = sandboxData
+
+  sandboxData.codeData = e.data.codeData
+  Message.window.send(window.top!, {
+    action: Action.Window.HttpRequest,
+    sandboxId: query?.sandboxId,
+    requestData: { method: 'GET', url: query?.url },
+    callbackData: { action: Action.Window.LoadSandboxResponse },
+  })
+})
+
+/** 监听加载 sandbox 响应内容  */
+Message.window.on(Action.Window.LoadSandboxResponse, e => {
+  const { responseText } = e.data.responseData || {}
   const { codeData, query } = sandboxData
+  const iframe: any = document.querySelector('.iframe')
 
-  if (action === 'loadSandbox') {
-    sandboxData.codeData = codeContent
-    window.top?.postMessage(
-      {
-        action: 'httpRequest',
-        sandboxId: query?.sandboxId,
-        requestData: { method: 'GET', url: query?.url },
-        callbackData: { action: 'loadSandboxResponse' },
-      },
-      '*'
-    )
-  } else if (action === 'loadSandboxResponse') {
-    const { responseText } = responseData || {}
-
-    iframe.srcdoc = responseText
-      .replace(
-        /<script\s+[^>]*src\s*=\s*(['"])(.*?)\1[^>]*>/gi,
-        (_, __, src) => {
-          return `<script src="${replaceUrl(src)}">`
-        }
-      )
-      .replace(/background-image:\s*url\((['"]?)(.*?)\1\)/gi, (_, __, url) => {
-        return `background-image: url(${replaceUrl(url)})`
-      })
-      .replace(/(action|href|src)="([^"]*)"/gi, (_, attrName, attrValue) => {
-        return `${attrName}="${replaceUrl(attrValue)}"`
-      })
-      .replace(
-        /(<head>)/i,
-        `
+  iframe.srcdoc = responseText
+    .replace(/<script\s+[^>]*src\s*=\s*(['"])(.*?)\1[^>]*>/gi, (_, __, src) => {
+      return `<script src="${replaceUrl(src)}">`
+    })
+    .replace(/background-image:\s*url\((['"]?)(.*?)\1\)/gi, (_, __, url) => {
+      return `background-image: url(${replaceUrl(url)})`
+    })
+    .replace(/(action|href|src)="([^"]*)"/gi, (_, attrName, attrValue) => {
+      return `${attrName}="${replaceUrl(attrValue)}"`
+    })
+    .replace(
+      /(<head>)/i,
+      `
 <script> 
-  const sandboxData = {
-    query: ${JSON.stringify(query)},
-  }
+const sandboxData = {
+  query: ${JSON.stringify(query)},
+  Action: ${JSON.stringify(Action)},
+}
 </script>
 
 <script src='/sandbox/script.js'></script>
 
 <style>
-  ${codeData?.['content.css']}
+${codeData?.['content.css']}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', ()=> {
-  
+
 })
- </script>
-      $1`
-      )
-  } else if (action === 'forward') {
-    iframe.contentWindow.postMessage(forwardData, '*')
-  }
+</script>
+    $1`
+    )
+})
+
+/** 监听向 子iframe 的转发事件 */
+Message.window.on(Action.Window.Forward, e => {
+  const iframe: any = document.querySelector('.iframe')
+
+  Message.window.send(iframe.contentWindow, e.data.forwardData)
 })

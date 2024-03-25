@@ -1,8 +1,14 @@
-// @ts-nocheck
+import type { Action } from '@/utils'
 
+/** 父级向当前沙盒环境注入的变量 */
+declare const sandboxData: {
+  /** 当前 url queryString数据 */
+  query: any
+  /** message 通信类型枚举值 */
+  Action: typeof Action
+}
 ;(() => {
-  /** 父级向当前沙盒环境注入的变量 */
-  const { query } = sandboxData || {}
+  const { query, Action } = sandboxData || {}
 
   /** 存放当前正在进行中的 xhr 请求 */
   const xhrSendMap = {}
@@ -45,13 +51,13 @@
       this.url = url
 
       logger(options, 'xhr-open:', method, url)
-      xhrOpen.call(this, method, url, ...params)
+      xhrOpen.call(this, method, url, ...(params as [any]))
     }
 
     XMLHttpRequest.prototype.send = function (data) {
       const xhrSendKey = Math.random().toString().slice(2)
       const postData = {
-        action: 'httpRequest',
+        action: Action.Window.HttpRequest,
         forward: true,
         sandboxId: query?.sandboxId,
         requestData: {
@@ -61,7 +67,7 @@
           body: data,
         },
         callbackData: {
-          action: 'httpResponse',
+          action: Action.Window.HttpResponse,
           xhrSendKey,
         },
       }
@@ -76,14 +82,14 @@
   const appendChildModify = options => {
     const originalAppendChild = Element.prototype.appendChild
 
-    Element.prototype.appendChild = function (node) {
+    Element.prototype.appendChild<any> = function (node) {
       if (node?.tagName?.toLowerCase() === 'script') {
         node.src = replaceUrl(node.src)
 
         logger(options, 'appendChild-script:', node.src)
       }
 
-      return originalAppendChild.apply(this, arguments)
+      return originalAppendChild.apply(this, arguments as any)
     }
   }
 
@@ -101,7 +107,7 @@
         logger(options, 'setAttribute-src:', value)
         originalSetAttribute.call(this, name, value)
       } else {
-        originalSetAttribute.apply(this, arguments)
+        originalSetAttribute.apply(this, arguments as any)
       }
     }
   }
@@ -110,32 +116,32 @@
   const newImageModify = options => {
     const OriginalImage = window.Image
 
-    window.Image = function () {
-      const img = new OriginalImage()
+    window.Image = function (width, height) {
+      const img = new OriginalImage(width, height)
       const originalSrcSetter = Object.getOwnPropertyDescriptor(
         HTMLImageElement.prototype,
         'src'
-      ).set
+      )?.set
       const originalSrcGetter = Object.getOwnPropertyDescriptor(
         HTMLImageElement.prototype,
         'src'
-      ).get
+      )?.get
 
       Object.defineProperty(img, 'src', {
         set: function (src) {
           src = replaceUrl(src)
 
           logger(options, 'setImage-src:', src)
-          originalSrcSetter.call(this, src)
+          originalSrcSetter?.call(this, src)
         },
 
         get: function () {
-          return originalSrcGetter.call(this)
+          return originalSrcGetter?.call(this)
         },
       })
 
       return img
-    }
+    } as unknown as typeof OriginalImage
   }
 
   /** 拦截并修改 document.createElement() */
@@ -148,23 +154,23 @@
         const originalSrcSetter = Object.getOwnPropertyDescriptor(
           HTMLScriptElement.prototype,
           'src'
-        ).set
+        )?.set
 
         const originalSrcGetter = Object.getOwnPropertyDescriptor(
           HTMLScriptElement.prototype,
           'src'
-        ).get
+        )?.get
 
         Object.defineProperty(scriptElement, 'src', {
           set: function (src) {
             src = replaceUrl(src)
 
             logger(options, 'createElement-src:', src)
-            originalSrcSetter.call(this, src)
+            originalSrcSetter?.call(this, src)
           },
 
           get: function () {
-            return originalSrcGetter.call(this)
+            return originalSrcGetter?.call(this)
           },
         })
 
@@ -180,7 +186,7 @@
     window.addEventListener('message', e => {
       const { action, xhrSendKey, responseData } = e.data
 
-      if (action === 'httpResponse') {
+      if (action === Action.Window.HttpResponse) {
         const { responseText, headers, status, statusText } = responseData || {}
         const xhr = xhrSendMap[xhrSendKey]
 
