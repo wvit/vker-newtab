@@ -8,8 +8,12 @@ type MessageType<T extends Action.Background | Action.Newtab | Action.Window> =
 /** 区分 chrome.runtime.message 的 action 操作类型*/
 export namespace Action {
   export enum Background {
-    /** 安装应用 */
+    /** 安装小部件 */
     InstallWidget = 'installWidget',
+    /** 卸载小部件 */
+    UninstallWidget = 'uninstallWidget',
+    /** 获取已安装小部件版本 */
+    GetWidgetVersion = 'getWidgetVersion',
   }
 
   export enum Newtab {
@@ -19,19 +23,23 @@ export namespace Action {
     CreateWidget = 'createWidget',
     /** 更新小部件数据 */
     UpdateWidget = 'updateWidget',
+    /** 移除小部件 */
+    DeleteWidget = 'deleteWidget',
   }
 
   export enum Window {
+    /** 部分场景需要转发 message。例如 网站向 backgorund 发送消息，或者 content 向 iframe 下的 iframe 发送消息。 */
+    Forward = 'forward',
     /** 转发 http 请求 */
     HttpRequest = 'httpRequest',
     /** 转发 http 请求后的响应 */
     HttpResponse = 'httpResponse',
-    /** 转发 message 信息 */
-    Forward = 'forward',
     /** 通知加载 sandbox 内容 */
     LoadSandbox = 'loadSandbox',
     /** 加载 sandbox 的响应 */
     LoadSandboxResponse = 'loadSandboxResponse',
+    /** 获取小部件版本的响应 */
+    WidgetVersionResponse = 'widgetVersionResponse',
   }
 }
 

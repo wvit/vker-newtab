@@ -16,6 +16,9 @@ export class StoreHandle<T extends string[]> {
   /** 实例化参数 */
   options = {} as StoreHandleOptions<T>
 
+  /** 是否已经准备就绪 */
+  ready = false
+
   /** 监听数据发生改变的事件 */
   changeEvents = [] as { id: string; callback: (e: any) => any }[]
 
@@ -212,16 +215,22 @@ export class StoreHandle<T extends string[]> {
 
   /** 获取数据表对象容器 */
   async getObjectStore(storeName) {
-    /** 等待检查数据表是否都准备完毕 */
-    await inspectTimer(() => {
-      const [options, dbResult] = this.getDb(['options', 'dbResult'])
-      return options?.storeNames?.length === dbResult?.objectStoreNames?.length
-    })
+    if (!this.ready) {
+      /** 等待检查数据表是否都准备完毕 */
+      await inspectTimer(() => {
+        const [options, dbResult] = this.getDb(['options', 'dbResult'])
+        return (
+          options?.storeNames?.length === dbResult?.objectStoreNames?.length
+        )
+      })
 
-    /** 等待检查是否没有正在进行中的事务 */
-    await inspectTimer(() => {
-      return !this.getDb('dbRequest')?.transaction?.mode
-    })
+      /** 等待检查是否没有正在进行中的事务 */
+      await inspectTimer(() => {
+        return !this.getDb('dbRequest')?.transaction?.mode
+      })
+    }
+
+    this.ready = true
 
     return this.getDb('dbResult')
       .transaction([storeName], 'readwrite')

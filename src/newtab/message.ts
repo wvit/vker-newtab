@@ -17,9 +17,11 @@ Message.newtab.on(
     const { widgetData } = message
     const result = await storeHandles.widget.detail(widgetData.id)
 
-    if (!result) {
-      await storeHandles.widget.create(widgetData)
+    if (result) {
+      await storeHandles.widget.delete(widgetData.id)
     }
+    await storeHandles.widget.create(widgetData)
+
     sendResponse(true)
   }
 )
@@ -30,6 +32,17 @@ Message.newtab.on(
   async (message, sender, sendResponse) => {
     const { widgetData } = message
     const result = await storeHandles.widget.update(widgetData)
+
+    sendResponse(result)
+  }
+)
+
+/** 移除小部件 */
+Message.newtab.on(
+  Action.Newtab.DeleteWidget,
+  async (message, sender, sendResponse) => {
+    const { widgetData } = message
+    const result = await storeHandles.widget.delete(widgetData.id)
 
     sendResponse(result)
   }
