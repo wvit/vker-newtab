@@ -2,18 +2,15 @@
   position: relative;
 
   .react-grid-item {
-    z-index: 2;
     transition: all 200ms ease;
     transition-property: left, top, width, height;
 
-    &.cssTransforms {
-      transition-property: transform, width, height;
+    &.react-draggable {
+      z-index: 2;
     }
 
-    &.resizing {
-      transition: none;
-      z-index: 1;
-      will-change: width, height;
+    &.cssTransforms {
+      transition-property: transform, width, height;
     }
 
     &.react-grid-placeholder {
@@ -25,13 +22,15 @@
     &.react-draggable-dragging,
     &.resizing {
       transition: none;
-      will-change: transform;
+      will-change: transform, width, height;
     }
 
     &.react-draggable-dragging::after,
     &.resizing::after {
       content: "";
       position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       z-index: 3;
@@ -64,14 +63,6 @@
   .react-resizable-hide {
     .react-resizable-handle {
       display: none;
-    }
-  }
-}
-
-.sandbox-item {
-  &:hover {
-    .sandbox-header {
-      height: 24px;
     }
   }
 }

@@ -40,7 +40,8 @@ export const Create = memo((props: CreateProps) => {
     return {
       id,
       codeData,
-      layoutData: { i: id, w: 5, h: 5, x: 1, y: 1 },
+      status: true,
+      layoutData: { i: id, w: 5, h: 3, x: 1, y: 1 },
     }
   }
 
@@ -85,7 +86,7 @@ export const Create = memo((props: CreateProps) => {
           wrapData: {
             resize: true,
             opacity: 1,
-            'background-color': 'rgba(0,0,0,0.5)',
+            backgroundColor: 'rgba(0,0,0,0.5)',
           },
         }}
         className=" pt-4"
@@ -162,7 +163,7 @@ export const Create = memo((props: CreateProps) => {
                     <Switch />
                   </Item>
                   <Item
-                    name={['wrapData', 'border-radius']}
+                    name={['wrapData', 'borderRadius']}
                     label="圆角"
                     wrapperCol={{ span: 8 }}
                   >
@@ -176,7 +177,7 @@ export const Create = memo((props: CreateProps) => {
                     <Input placeholder="0 - 1 之间的不透明度" />
                   </Item>
                   <Item
-                    name={['wrapData', 'background-color']}
+                    name={['wrapData', 'backgroundColor']}
                     label="背景颜色"
                     getValueFromEvent={e => e.toRgbString()}
                   >

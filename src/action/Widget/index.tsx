@@ -53,7 +53,9 @@ export const Widget = memo(() => {
             <li className="card-item w-[31.2%] h-[150px] m-2 p-2 flex flex-col">
               <h4 className=" text-sm font-medium flex-shrink-0">
                 {name}
-                <span className="text-[#999] font-normal">({version})</span>
+                {version && (
+                  <span className="text-[#999] font-normal">({version})</span>
+                )}
               </h4>
               <p className="mt-2 text-xs h-[100%]">{intro}</p>
               <div className="flex-shrink-0 w-[100&] flex items-center">

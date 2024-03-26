@@ -26,9 +26,13 @@ declare global {
     sandboxData: { type: 'iframe' | 'custom'; editable: boolean; url: string }
     /** 沙盒容器配置 */
     wrapData: {}
-    /** 小部件所需的自定义代码 */
+    /** 小部件所需的代码 */
     codeData: {
-      'content.css': string
+      'index.html'?: string
+      'index.css'?: string
+      'index.js'?: string
+      'content.js'?: string
+      'content.css'?: string
     }
   }
 }

@@ -1,22 +1,23 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import GridLayout from 'react-grid-layout'
 import { Icon } from '@/components/Icon'
 import { Editor } from '@/components/Editor'
 import { storeHandles } from '@/utils/store'
-import { Dom, urlQuery, Message, Action } from '@/utils'
+import { Dom, Message, Action } from '@/utils'
+import { Widget } from '../Widget'
 import './index.less'
 
 export const Layout = () => {
-  const [widgetList, setWidgetList] = useState<any[]>([])
+  const [widgetList, setWidgetList] = useState<WidgetType[]>([])
   const [fileTree, setFileTree] = useState<any[]>([])
   const [activeFile, setActiveFile] = useState('')
   const [currentCodeValue, setCurrentCodeValue] = useState('')
-  const initSandboxIdsRef = useRef<string[]>([])
 
   /** 获取小部件列表 */
   const getWidgetList = async () => {
     const { list } = await storeHandles.widget.getAll()
-    const treeData = list.map(item => {
+    const filterList = list.filter(item => item.status)
+    const treeData = filterList.map(item => {
       const { name, id, codeData } = item
       const fileList = Object.keys(codeData).map(key => {
         return {
@@ -25,9 +26,9 @@ export const Layout = () => {
           codeValue: codeData[key],
           icon: () => {
             const iconProps = {
+              html: { name: 'icon-html' },
               css: { name: 'icon-css', className: 'size-5' },
-              js: { name: 'icon-js', className: 'size-3' },
-              ts: { name: 'icon-ts' },
+              js: { name: 'icon-js', className: '!size-3' },
             }[key.split('.')[1]]
 
             return iconProps && <Icon {...iconProps} />
@@ -39,22 +40,7 @@ export const Layout = () => {
     })
 
     setFileTree(treeData)
-    setWidgetList(list || [])
-  }
-
-  /** 初始化沙盒容器 */
-  const initSandbox = (ref, widgetData) => {
-    const { id, codeData } = widgetData || {}
-    /** 已经初始化过，就不再reload */
-    if (initSandboxIdsRef.current.includes(id)) return
-
-    initSandboxIdsRef.current.push(id)
-    setTimeout(() => {
-      Message.window.send(ref.contentWindow, {
-        action: Action.Window.LoadSandbox,
-        codeData,
-      })
-    }, 200)
+    setWidgetList(filterList || [])
   }
 
   /** 保存栅格布局数据 */
@@ -72,7 +58,7 @@ export const Layout = () => {
   /** 选中文件项 */
   const selectFile = selectNode => {
     const { codeValue, key } = selectNode
-    if (!codeValue) return
+    if (!key) return
 
     setCurrentCodeValue(codeValue)
     setActiveFile(key)
@@ -122,47 +108,15 @@ export const Layout = () => {
             onDragStop={saveGridLayout}
             onResizeStop={saveGridLayout}
           >
-            {widgetList?.map(item => {
-              const { sandboxData, codeData, id } = item
-              const { url, editable } = sandboxData || {}
-              const domain = url?.match(/(https?:\/\/[^\/]+)/)?.[0]
-              const protocol = url?.match(/^https?:\/\//)?.[0]
-              const queryString = urlQuery.stringify({
-                protocol,
-                domain,
-                url,
-                extensionId: `chrome-extension://${chrome.runtime.id}`,
-                sandboxId: id,
-              })
-
-              return (
-                <div
-                  key={id}
-                  className="sandbox-item flex flex-col rounded overflow-hidden "
-                >
-                  <div className="sandbox-header overflow-hidden bg-[rgba(255,255,255,0.6)] w-[100%] h-0 flex justify-end items-center px-2 cursor-pointer transition-[200ms] absolute top-0 left-0">
-                    <Icon
-                      name="icon-code"
-                      onClick={() => {
-                        selectFile({
-                          key: `${id}:content.css`,
-                          codeValue: codeData?.['content.css'],
-                        })
-                      }}
-                    />
-                  </div>
-                  <iframe
-                    ref={ref => initSandbox(ref, item)}
-                    id={id}
-                    src={editable ? `/sandbox/index.html?${queryString}` : url}
-                    className="w-[100%] h-0 flex-1 "
-                  ></iframe>
-                </div>
-              )
-            })}
+            {widgetList.map(item => (
+              <div key={item.id}>
+                <Widget widgetData={item} onSelectFile={selectFile} />
+              </div>
+            ))}
           </GridLayout>
         </div>
       </div>
+
       <div
         className="w-[50%] h-[100%] flex-shrink-0 bg-[#fff] duration-200"
         style={{
