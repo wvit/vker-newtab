@@ -10,12 +10,20 @@ declare global {
     id: string
     /** 小部件名称 */
     name: string
+    /** 启用/停用 */
+    status: boolean
+    /** 简介 */
+    intro?: string
+    /** 详细描述 */
+    desc?: string
     /** 小部件封面图片url */
-    cover: string
+    cover?: string
+    /** 版本号 */
+    version?: string
     /** 在 react-grid-layout 中的布局信息 */
     layoutData: { i: string; w: number; h: number; x: number; y: number }
     /** 沙盒配置 */
-    sandboxData: { editable: boolean; url: string }
+    sandboxData: { type: 'iframe' | 'custom'; editable: boolean; url: string }
     /** 沙盒容器配置 */
     wrapData: {}
     /** 小部件所需的自定义代码 */
