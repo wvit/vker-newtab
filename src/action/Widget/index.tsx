@@ -1,8 +1,9 @@
 import { memo, useEffect, useState } from 'react'
 import Switch from 'antd/es/switch'
 import Button from 'antd/es/button'
+import message from 'antd/es/message'
 import { Icon } from '@/components/Icon'
-import { Action, Message } from '@/utils'
+import { Action, Message, exportContent } from '@/utils'
 import { Create } from './Create'
 
 /** 小部件管理列表 */
@@ -32,18 +33,22 @@ export const Widget = memo(() => {
     getWidgetList()
   }
 
+  /** 导出所有小部件 */
+  const exportAllWidget = async () => {
+    await exportContent(widgetList)
+    message.success('已导出至剪切板')
+  }
+
   useEffect(() => {
     getWidgetList()
   }, [])
 
   return (
     <div className="h-[100%] w-[100%] relative">
-      <Button
-        className="absolute right-0 top-[-48px]"
-        onClick={() => setCreateWidgetVisible(true)}
-      >
-        创建小部件
-      </Button>
+      <div className="absolute right-0 top-[-48px]">
+        <Button className='mt-2' onClick={exportAllWidget}>导出所有小部件</Button>
+        <Button onClick={() => setCreateWidgetVisible(true)}>创建小部件</Button>
+      </div>
 
       <ul className="flex flex-wrap overflow-auto">
         {widgetList?.map(item => {

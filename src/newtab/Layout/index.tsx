@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import GridLayout from 'react-grid-layout'
 import { Icon } from '@/components/Icon'
 import { Editor } from '@/components/Editor'
-import { storeHandles } from '@/utils/store'
+import { storeHandles, objectHandles } from '@/utils/store'
 import { Dom, Message, Action } from '@/utils'
 import { Widget } from '../Widget'
 import './index.less'
@@ -11,7 +11,14 @@ export const Layout = () => {
   const [widgetList, setWidgetList] = useState<WidgetType[]>([])
   const [fileTree, setFileTree] = useState<any[]>([])
   const [activeFile, setActiveFile] = useState('')
+  const [globalConfig, setGlobalConfig] = useState<any>({})
   const [currentCodeValue, setCurrentCodeValue] = useState('')
+
+  /** 获取全局配置 */
+  const getGlobalConfig = async () => {
+    const config = await objectHandles.globalConfig.get()
+    setGlobalConfig(config)
+  }
 
   /** 获取小部件列表 */
   const getWidgetList = async () => {
@@ -84,7 +91,10 @@ export const Layout = () => {
 
   useEffect(() => {
     getWidgetList()
+    getGlobalConfig()
+
     storeHandles.widget.onChange(getWidgetList)
+    objectHandles.globalConfig.onChange(getGlobalConfig)
   }, [])
 
   return (
@@ -96,7 +106,7 @@ export const Layout = () => {
         <div
           className="h-[100vh] w-[100vw] overflow-y-auto"
           style={{
-            background: `url(http://124.220.171.110:8000/static/image/panda1.jpg) center/cover no-repeat`,
+            background: `url(${globalConfig.backgroundUrl}) rgba(0,0,0,0.9) center/cover no-repeat`,
           }}
         >
           <GridLayout

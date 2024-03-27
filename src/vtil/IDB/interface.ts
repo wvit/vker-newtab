@@ -11,47 +11,63 @@ export interface IDBOptions<T extends string[], K extends string[]> {
 }
 
 /** 实例化数据表操作方法参数 */
-export interface StoreHandleOptions<T extends string[], K extends string[]> {
+export interface DBHandleOptions<T extends string[], K extends string[]> {
   /** 数据库实例 */
   db: IDB<T, K>
 }
 
-export namespace StoreHandles {
-  /** 数据库暴露出去的增删改查方法 */
-  export type Handles<T extends string> = Record<
-    T,
-    {
-      /** 添加数据 */
-      create: (data: any) => Promise<boolean>
-      /** 更新数据 */
-      update: (data: any) => Promise<boolean>
-
-      /** 批量添加数据 */
-      batchCreate: (data: any[]) => Promise<boolean>
-      /** 批量更新数据 */
-      batchUpdate: (data: any[]) => Promise<boolean>
-
-      /** 删除数据 */
-      delete: (id: string) => Promise<boolean>
-      /** 删除所有数据 */
-      deleteAll: () => Promise<boolean>
-
-      /** 获取数据详情 */
-      detail: (id: string) => Promise<any>
-      /** 获取查询条件的分页数据 */
-      getPage: (query: Query) => Promise<PagingValue>
-      /** 获取查询条件的所有数据 */
-      getAll: () => Promise<StoreAllValue>
-
-      /** 监听数据发生变化 */
-      onChange: <T>(callback: T) => {
-        id: string
-        callback: T
-        remove: () => void
-      }
-    }
-  >
+/** 公共操作方法 */
+export type CommonHandles = {
+  /** 监听数据发生变化 */
+  onChange: <T extends (changeData: any) => void>(
+    callback: T
+  ) => {
+    id: string
+    callback: T
+    remove: () => void
+  }
 }
+
+/** 数据表提供的增删改查方法 */
+export type StoreHandles<T extends string = string> = Record<
+  T,
+  {
+    /** 添加数据 */
+    create: (data: any) => Promise<boolean>
+    /** 更新数据 */
+    update: (data: any) => Promise<boolean>
+
+    /** 批量添加数据 */
+    batchCreate: (data: any[]) => Promise<boolean>
+    /** 批量更新数据 */
+    batchUpdate: (data: any[]) => Promise<boolean>
+
+    /** 删除数据 */
+    delete: (id: string) => Promise<boolean>
+    /** 删除所有数据 */
+    deleteAll: () => Promise<boolean>
+
+    /** 获取数据详情 */
+    detail: (id: string) => Promise<any>
+    /** 获取查询条件的分页数据 */
+    getPage: (query: Query) => Promise<PagingValue>
+    /** 获取查询条件的所有数据 */
+    getAll: () => Promise<StoreAllValue>
+  } & CommonHandles
+>
+
+/** 数据对象提供的操作方法 */
+export type ObjectHandles<T extends string = string> = Record<
+  T,
+  {
+    /** 获取对象字段值 */
+    get: <K extends string | string[]>(
+      key?: K
+    ) => Promise<Record<K[number], any>>
+    /** 设置对象字段值 */
+    set: (data: Record<string, any>) => Promise<boolean>
+  } & CommonHandles
+>
 
 /** 查询 */
 export interface Query {

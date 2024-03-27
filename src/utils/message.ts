@@ -40,6 +40,8 @@ export namespace Action {
     LoadIframeResponse = 'loadIframeResponse',
     /** 获取小部件版本的响应 */
     WidgetVersionResponse = 'widgetVersionResponse',
+    /** 设置背景 */
+    SetBackground = 'setBackground',
   }
 }
 

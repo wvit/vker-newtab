@@ -1,4 +1,4 @@
-import { storeHandles } from '@/utils/store'
+import { storeHandles, objectHandles } from '@/utils/store'
 import { Action, Message, Dom } from '@/utils'
 
 /** 获取小部件列表 */
@@ -81,4 +81,10 @@ Message.window.on(Action.Window.HttpRequest, async e => {
         }
       : { ...resultData }
   )
+})
+
+/** 设置 newtab 页面背景 */
+Message.window.on(Action.Window.SetBackground, e => {
+  const { backgroundUrl } = e.data
+  objectHandles.globalConfig.set({ backgroundUrl })
 })

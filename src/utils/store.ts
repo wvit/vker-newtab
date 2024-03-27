@@ -1,4 +1,4 @@
-import { StoreHandle, IDB } from '@/vtil'
+import { Handle, IDB } from '@/vtil'
 
 /** 实例化数据库 */
 const db = new IDB({
@@ -8,4 +8,4 @@ const db = new IDB({
 })
 
 /** 生成数据表的操作方法 */
-export const { storeHandles } = new StoreHandle({ db })
+export const { storeHandles, objectHandles } = new Handle({ db })

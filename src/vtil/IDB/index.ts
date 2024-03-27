@@ -1,6 +1,6 @@
 import type { IDBOptions, CreateStoreData, DeleteStoreData } from './interface'
 
-export * from './storeHandle'
+export * from './handle'
 
 export class IDB<T extends string[], K extends string[]> {
   constructor(options: IDBOptions<T, K>) {
@@ -25,7 +25,7 @@ export class IDB<T extends string[], K extends string[]> {
 
   /** 初始化IDBOpenDBRequest */
   initDbRequest() {
-    const { name, storeNames } = this.options
+    const { name, storeNames, objectNames } = this.options
     this.dbRequest = indexedDB.open(name)
 
     /** 每次数据库version升级事件 */
@@ -68,7 +68,7 @@ export class IDB<T extends string[], K extends string[]> {
       this.dbResult = result
 
       /** 循环创建数据表 */
-      for (const item of storeNames) {
+      for (const item of [...storeNames, ...objectNames]) {
         await this.createObjectStore({
           storeName: item,
           options: { keyPath: 'id' },

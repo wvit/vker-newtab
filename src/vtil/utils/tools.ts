@@ -1,3 +1,5 @@
+import { downloadContent } from './file'
+
 /** 传入一个时间戳，返回一个日期字符串 */
 export const getDate = ({ time, full, offsetOption = {} }) => {
   /** 生成一个日期对象 */
@@ -114,4 +116,14 @@ export const urlQuery = {
 
     return url ? `${url}?${queryString}` : queryString
   },
+}
+
+/** 导出内容 */
+export const exportContent = async (content: any, fileName?: string) => {
+  if (fileName) {
+    downloadContent(content, '')
+  } else {
+    const data = JSON.stringify(content, null, 2)
+    await navigator.clipboard.writeText(data)
+  }
 }
