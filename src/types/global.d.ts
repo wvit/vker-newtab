@@ -23,7 +23,7 @@ declare global {
     /** 在 react-grid-layout 中的布局信息 */
     layoutData: { i: string; w: number; h: number; x: number; y: number }
     /** 沙盒配置 */
-    sandboxData: { type: 'iframe' | 'custom'; editable: boolean; url: string }
+    sandboxData: { type: 'iframe' | 'custom'; url: string }
     /** 沙盒容器配置 */
     wrapData: {}
     /** 小部件所需的代码 */

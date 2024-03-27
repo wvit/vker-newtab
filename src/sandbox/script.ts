@@ -1,14 +1,14 @@
 import type { Action } from '@/utils'
 
-/** 父级向当前沙盒环境注入的变量 */
-declare const sandboxData: {
+/** 父级向当前环境注入的小部件配置数据 */
+declare const widgetData: {
   /** 当前 url queryString数据 */
   query: any
   /** message 通信类型枚举值 */
   Action: typeof Action
 }
 ;(() => {
-  const { query, Action } = sandboxData || {}
+  const { query, Action } = widgetData || {}
 
   /** 存放当前正在进行中的 xhr 请求 */
   const xhrSendMap = {}

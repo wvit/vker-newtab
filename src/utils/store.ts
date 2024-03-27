@@ -4,6 +4,7 @@ import { StoreHandle, IDB } from '@/vtil'
 const db = new IDB({
   name: 'vker-newtab',
   storeNames: ['widget'] as const,
+  objectNames: ['globalConfig'] as const,
 })
 
 /** 生成数据表的操作方法 */

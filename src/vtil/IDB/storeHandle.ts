@@ -8,13 +8,13 @@ import type {
 } from './interface'
 
 /** 数据表操作方法 */
-export class StoreHandle<T extends string[]> {
-  constructor(options: StoreHandleOptions<T>) {
+export class StoreHandle<T extends string[], K extends string[]> {
+  constructor(options: StoreHandleOptions<T, K>) {
     this.options = options || {}
   }
 
   /** 实例化参数 */
-  options = {} as StoreHandleOptions<T>
+  options = {} as StoreHandleOptions<T, K>
 
   /** 是否已经准备就绪 */
   ready = false

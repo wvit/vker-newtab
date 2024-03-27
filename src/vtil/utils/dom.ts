@@ -34,6 +34,13 @@ export class Dom {
     return Dom.setMethods(node)
   }
 
+  /** 通过Id获取单个节点 */
+  static queryId(id: string, parent?: Node | Document): Node {
+    /** querySelector 无法获取 id 为数字开头的节点 */
+    const node = (parent || document).getElementById(id) as Node
+    return Dom.setMethods(node)
+  }
+
   /** 获取多个节点 */
   static queryAll(select: string, parent?: Node): NodeList {
     const nodeList = (parent || document).querySelectorAll(select) as NodeList

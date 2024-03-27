@@ -16,7 +16,8 @@ export const Widget = memo((props: WidgetProps) => {
   const initSandboxIdsRef = useRef<string[]>([])
 
   const { sandboxData, wrapData, codeData, id } = widgetData
-  const { url, editable } = sandboxData || {}
+  const { url } = sandboxData || {}
+  const editable = Object.values(codeData).some(item => item)
   const domain = url?.match(/(https?:\/\/[^\/]+)/)?.[0]
   const protocol = url?.match(/^https?:\/\//)?.[0]
   const queryString = urlQuery.stringify({
@@ -36,6 +37,7 @@ export const Widget = memo((props: WidgetProps) => {
     ref.onload = () => {
       Message.window.send(ref.contentWindow, {
         action: Action.Window.LoadSandbox,
+        sandboxData,
         codeData,
       })
     }

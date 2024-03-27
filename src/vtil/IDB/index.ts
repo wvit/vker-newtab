@@ -2,14 +2,14 @@ import type { IDBOptions, CreateStoreData, DeleteStoreData } from './interface'
 
 export * from './storeHandle'
 
-export class IDB<T extends string[]> {
-  constructor(options: IDBOptions<T>) {
+export class IDB<T extends string[], K extends string[]> {
+  constructor(options: IDBOptions<T, K>) {
     this.options = options
     this.initDbRequest()
   }
 
   /** 数据库配置 */
-  options = {} as IDBOptions<T>
+  options = {} as IDBOptions<T, K>
 
   /** IndexedDB实例 */
   dbRequest?: IDBOpenDBRequest

@@ -58,7 +58,7 @@ export const Layout = () => {
   /** 选中文件项 */
   const selectFile = selectNode => {
     const { codeValue, key } = selectNode
-    if (!key) return
+    if (codeValue === undefined) return
 
     setCurrentCodeValue(codeValue)
     setActiveFile(key)
@@ -69,14 +69,15 @@ export const Layout = () => {
     if (!activeFile) return
     const [id, key] = activeFile.split(':')
     const findWidget = widgetList.find(item => item.id === id)
-    const sandbox = Dom.query(`#${id}`)
+    const sandbox = Dom.queryId(id)
     if (!findWidget || !sandbox) return
-    const { codeData } = findWidget
+    const { codeData, sandboxData } = findWidget
 
     codeData[key] = content
     await storeHandles.widget.update({ id, codeData })
     Message.window.send(sandbox.contentWindow, {
       action: Action.Window.LoadSandbox,
+      sandboxData,
       codeData,
     })
   }

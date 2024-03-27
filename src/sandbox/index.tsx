@@ -1,7 +1,7 @@
 import { urlQuery, Action, Message } from '@/utils'
 
-/** 当前沙盒环境需要用到的变量数据 */
-const sandboxData = {
+/** 当前小部件的配置数据 */
+const widgetData = {
   /** 沙盒需要执行的代码 */
   codeData: { css: '', js: '' },
   /** 当前链接上携带的参数 */
@@ -11,7 +11,7 @@ const sandboxData = {
 /** 替换url地址 */
 const replaceUrl = url => {
   if (!url) return url
-  const { query } = sandboxData
+  const { query } = widgetData
 
   if (url.indexOf(query?.extensionId) === 0) {
     url = url.replace(query?.extensionId, query?.domain)
@@ -28,21 +28,38 @@ const replaceUrl = url => {
 
 /** 监听通知加载 sandbox  */
 Message.window.on(Action.Window.LoadSandbox, e => {
-  const { query } = sandboxData
+  const { codeData, sandboxData } = e.data
+  const { query } = widgetData
+  const iframe: any = document.querySelector('.iframe')
 
-  sandboxData.codeData = e.data.codeData
-  Message.window.send(window.top!, {
-    action: Action.Window.HttpRequest,
-    sandboxId: query?.sandboxId,
-    requestData: { method: 'GET', url: query?.url },
-    callbackData: { action: Action.Window.LoadSandboxResponse },
-  })
+  widgetData.codeData = codeData
+
+  if (sandboxData.type === 'custom') {
+    iframe.srcdoc = `
+${codeData?.['page.html']}
+
+<style>
+  ${codeData?.['page.css']}
+</style>
+
+<script>
+  ${codeData?.['page.js']}
+</script>
+`
+  } else if (sandboxData.type === 'iframe') {
+    Message.window.send(window.top!, {
+      action: Action.Window.HttpRequest,
+      sandboxId: query?.sandboxId,
+      requestData: { method: 'GET', url: query?.url },
+      callbackData: { action: Action.Window.LoadIframeResponse },
+    })
+  }
 })
 
-/** 监听加载 sandbox 响应内容  */
-Message.window.on(Action.Window.LoadSandboxResponse, e => {
+/** 监听加载 iframe 响应内容  */
+Message.window.on(Action.Window.LoadIframeResponse, e => {
   const { responseText } = e.data.responseData || {}
-  const { codeData, query } = sandboxData
+  const { codeData, query } = widgetData
   const iframe: any = document.querySelector('.iframe')
 
   iframe.srcdoc = responseText
@@ -59,7 +76,7 @@ Message.window.on(Action.Window.LoadSandboxResponse, e => {
       /(<head>)/i,
       `
 <script> 
-const sandboxData = {
+const widgetData = {
   query: ${JSON.stringify(query)},
   Action: ${JSON.stringify(Action)},
 }
@@ -72,9 +89,7 @@ ${codeData?.['content.css']}
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', ()=> {
-
-})
+${codeData?.['content.js']}
 </script>
     $1`
     )

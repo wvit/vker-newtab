@@ -36,8 +36,8 @@ export namespace Action {
     HttpResponse = 'httpResponse',
     /** 通知加载 sandbox 内容 */
     LoadSandbox = 'loadSandbox',
-    /** 加载 sandbox 的响应 */
-    LoadSandboxResponse = 'loadSandboxResponse',
+    /** 加载 iframe 的响应 */
+    LoadIframeResponse = 'loadIframeResponse',
     /** 获取小部件版本的响应 */
     WidgetVersionResponse = 'widgetVersionResponse',
   }

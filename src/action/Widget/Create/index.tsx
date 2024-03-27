@@ -34,7 +34,7 @@ export const Create = memo((props: CreateProps) => {
     const id = getId()
     const codeData = {
       iframe: { 'content.css': '', 'content.js': '' },
-      custom: { 'index.html': '', 'index.css': '', 'index.js': '' },
+      custom: { 'page.html': pageHtmlTemplate, 'page.css': '', 'page.js': '' },
     }[sandboxType]
 
     return {
@@ -192,3 +192,28 @@ export const Create = memo((props: CreateProps) => {
     </Modal>
   )
 })
+
+/** 自定义小部件 html 模版 */
+const pageHtmlTemplate = ` 
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+<body>
+</body>
+
+</html>
+`

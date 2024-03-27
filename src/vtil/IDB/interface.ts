@@ -1,17 +1,19 @@
 import type { IDB } from './index'
 
 /** 实例化IDB配置 */
-export interface IDBOptions<T extends string[]> {
+export interface IDBOptions<T extends string[], K extends string[]> {
   /** 数据库名称 */
   name: string
   /** 需要创建的数据表 */
   storeNames: T
+  /** 需要创建的对象存储器 */
+  objectNames: K
 }
 
 /** 实例化数据表操作方法参数 */
-export interface StoreHandleOptions<T extends string[]> {
+export interface StoreHandleOptions<T extends string[], K extends string[]> {
   /** 数据库实例 */
-  db: IDB<T>
+  db: IDB<T, K>
 }
 
 export namespace StoreHandles {
