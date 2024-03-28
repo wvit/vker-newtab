@@ -46,7 +46,7 @@ export const Widget = memo(() => {
   return (
     <div className="h-[100%] w-[100%] relative">
       <div className="absolute right-0 top-[-48px]">
-        <Button className='mt-2' onClick={exportAllWidget}>导出所有小部件</Button>
+        <Button className='mr-2' onClick={exportAllWidget}>导出所有小部件</Button>
         <Button onClick={() => setCreateWidgetVisible(true)}>创建小部件</Button>
       </div>
 
